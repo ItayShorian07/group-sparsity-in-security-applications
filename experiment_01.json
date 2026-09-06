@@ -1,0 +1,24 @@
+{
+  "normal_csv": "data/TrafficLabelling/Monday-WorkingHours.pcap_ISCX.csv",
+  "test_csv": "data/TrafficLabelling/Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv",
+  "output_dir": "runs/experiment_01",
+  "seeds": [
+    17,
+    42,
+    2026
+  ],
+  "hidden_dims": [
+    128,
+    64
+  ],
+  "latent_dim": 8,
+  "epochs": 100,
+  "batch_size": 512,
+  "learning_rate": 0.001,
+  "beta": 0.01,
+  "patience": 10,
+  "target_fpr": 0.01,
+  "train_fraction": 0.7,
+  "validation_fraction": 0.15,
+  "threads": 4
+}

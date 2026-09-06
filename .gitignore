@@ -1,0 +1,27 @@
+# Local datasets and experiment outputs
+data/
+runs/
+*.csv
+*.zip
+*.pcap
+*.pcapng
+*.pt
+*.npz
+
+# Python environment and generated files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Local credentials, editor settings, and operating system files
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+.DS_Store
