@@ -22,7 +22,7 @@ DEFAULTS = {
     "seeds": [17, 42, 2026], "hidden_dims": [128, 64], "latent_dim": 8,
     "epochs": 100, "batch_size": 512, "learning_rate": 0.001,
     "beta": 0.01, "patience": 10, "target_fpr": 0.01,
-    "train_fraction": 0.7, "validation_fraction": 0.15, "threads": 4,
+    "train_fraction": 0.75, "validation_fraction": 0.25, "threads": 4,
 }
 
 
@@ -58,8 +58,9 @@ def load_config(path: Path) -> dict:
     if not 0 < config["target_fpr"] < 1:
         raise ValueError("Require 0 < target_fpr < 1.")
     if not (0 < config["train_fraction"] < 1 and 0 < config["validation_fraction"] < 1
-            and config["train_fraction"] + config["validation_fraction"] < 1):
-        raise ValueError("Split fractions must be positive and sum to less than one.")
+            and np.isclose(config["train_fraction"] + config["validation_fraction"],
+                           1.0, rtol=0, atol=1e-9)):
+        raise ValueError("Train and validation fractions must be positive and sum to one.")
     for key in ("normal_csv", "test_csv", "output_dir"):
         config[key] = str(Path(config[key]).expanduser().resolve())
     for key in ("normal_csv", "test_csv"):
@@ -103,7 +104,8 @@ def run(config: dict) -> Path:
         logger.info("Split sizes: %s | retained features: %d", audit["split_sizes"], len(processor.columns))
         logger.info("Removed %d normal duplicates and %d overlapping test rows",
                     audit["normal_duplicate_rows_removed"], audit["test_overlap_rows_removed"])
-        if len(arrays["calibration"]) * config["target_fpr"] < 10:
+        logger.info("Threshold calibration reuses validation rows after restoring the best model")
+        if len(arrays["validation"]) * config["target_fpr"] < 10:
             logger.warning("Calibration tail contains fewer than 10 expected examples; threshold may be unstable")
         torch.set_num_threads(config["threads"])
         torch.use_deterministic_algorithms(True)
@@ -119,16 +121,17 @@ def run(config: dict) -> Path:
             model = VAE(len(processor.columns), config["hidden_dims"], config["latent_dim"])
             history = train(model, arrays["train"], arrays["validation"], config | {"seed": seed}, logger)
             pd.DataFrame(history).to_csv(directory / "training_history.csv", index=False)
-            calibration_scores = score(model, arrays["calibration"], config["batch_size"])
+            calibration_scores = score(model, arrays["validation"], config["batch_size"])
             threshold = calibrate(calibration_scores, config["target_fpr"])
             test_scores = score(model, arrays["test"], config["batch_size"])
             metrics = evaluate(labels, test_scores, threshold)
-            metrics.update(seed=seed, epochs_completed=len(history),
+            metrics.update(calibration_source="validation", seed=seed, epochs_completed=len(history),
                            best_epoch=min(history, key=lambda row: row["validation_squared_l2"])["epoch"],
                            calibration_fpr=float(np.mean(calibration_scores > threshold)),
                            elapsed_seconds=time.perf_counter() - started)
             write_json(directory / "metrics.json", metrics)
-            pd.DataFrame({"score": calibration_scores}).to_csv(directory / "calibration_scores.csv", index=False)
+            pd.DataFrame({"source_row": manifest.loc[manifest.split == "validation", "source_row"].to_numpy(),
+                          "score": calibration_scores}).to_csv(directory / "calibration_scores.csv", index=False)
             pd.DataFrame({"source_row": manifest.loc[manifest.split == "test", "source_row"].to_numpy(),
                           "label": labels, "score": test_scores,
                           "prediction": (test_scores > threshold).astype(int)}).to_csv(

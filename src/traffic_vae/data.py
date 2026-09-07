@@ -85,6 +85,9 @@ class Preprocessor:
 
 def prepare(normal_path: Path, test_path: Path, train_fraction: float,
             validation_fraction: float):
+    if not (0 < train_fraction < 1 and 0 < validation_fraction < 1
+            and np.isclose(train_fraction + validation_fraction, 1.0, rtol=0, atol=1e-9)):
+        raise ValueError("Train and validation fractions must be positive and sum to one.")
     normal, normal_labels = read_flows(normal_path)
     test, test_labels = read_flows(test_path)
     if set(normal_labels) != {"BENIGN"}:
@@ -98,12 +101,12 @@ def prepare(normal_path: Path, test_path: Path, train_fraction: float,
     # Keep identical feature vectors in only one normal split.
     normal = normal.drop_duplicates()
     n_train = int(len(normal) * train_fraction)
-    n_validation = int(len(normal) * validation_fraction)
-    if min(n_train, n_validation, len(normal) - n_train - n_validation) < 2:
+    n_validation = len(normal) - n_train
+    if min(n_train, n_validation) < 2:
         raise ValueError("Each normal split must contain at least two unique rows.")
     train = normal.iloc[:n_train]
-    validation = normal.iloc[n_train:n_train + n_validation]
-    calibration = normal.iloc[n_train + n_validation:]
+    # Assign every remaining row to validation, including rounding remainders.
+    validation = normal.iloc[n_train:]
     # Hash features without labels or row indices to exclude exact cross-day overlap.
     normal_hash = pd.util.hash_pandas_object(normal, index=False)
     test_hash = pd.util.hash_pandas_object(test, index=False)
@@ -113,7 +116,7 @@ def prepare(normal_path: Path, test_path: Path, train_fraction: float,
     if set(test_labels) != {"BENIGN", "DDOS"}:
         raise ValueError("Both test classes must remain after overlap removal.")
     processor = Preprocessor.fit(train)
-    frames = {"train": train, "validation": validation, "calibration": calibration, "test": test}
+    frames = {"train": train, "validation": validation, "test": test}
     arrays = {name: processor.transform(frame) for name, frame in frames.items()}
     manifest = pd.concat([
         pd.DataFrame({"split": name, "source_row": frame.index,
@@ -130,6 +133,8 @@ def prepare(normal_path: Path, test_path: Path, train_fraction: float,
         "retained_features": processor.columns,
         "dropped_features": [c for c in normal if c not in processor.columns],
         "missing_values_before_imputation": {k: int(v.isna().sum().sum()) for k, v in frames.items()},
+        "calibration_source": "validation",
+        "calibration_independent_of_model_selection": False,
         "split_policy": "Normal CSV row order, deduplicated before splitting; not verified chronological.",
     }
     return arrays, (test_labels == "DDOS").to_numpy(dtype=np.int64), processor, manifest, audit

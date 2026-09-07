@@ -82,11 +82,11 @@ this package. Other platforms may require compatible dependency versions.
 
 1. Strip whitespace from column headers and labels. Exclude flow IDs, IP addresses, timestamps, ports, protocol, and unnamed CSV indices. Ports and protocol are categorical; treating their numeric codes as continuous MSE targets is excluded from this baseline.
 2. Convert remaining features strictly to numeric. Replace infinities with missing values. Fail on unexpected textual features or incompatible CSV schemas.
-3. Remove duplicate normal feature vectors. Divide normal rows in their original CSV order: 70% training, 15% early-stopping validation, 15% threshold calibration. This is a **row-order split, not a verified chronological split**; the supplied files contain timestamps, but this baseline excludes them and does not sort by time.
+3. Remove duplicate normal feature vectors. Divide normal rows in their original CSV order: 75% training and 25% validation. The same validation rows are used for early stopping and threshold calibration; no separate calibration partition is reserved. Rounding remainders are assigned to validation, so all retained normal rows are used. This is a **row-order split, not a verified chronological split**; the supplied files contain timestamps, but this baseline excludes them and does not sort by time.
 4. Fit medians, feature retention, signed `log1p`, and standardization using training rows only. Drop all-missing and constant training features. Apply the fitted transformation to other splits without clipping anomalies. Signed `log1p` handles heavy tails and preserves negative values, including dataset sentinel values; interpreting these sentinels is a future preprocessing sensitivity analysis.
 5. Exclude test feature vectors that exactly match any normal partition. Preserve remaining test duplicates and report all exclusions. Feature hashing is a practical exact-vector overlap check; it does not prove independence of related flows or sessions. The evaluation population is the retained Friday rows, not every row in the original CSV.
 6. Fit a VAE with encoder widths 128 and 64, latent dimension 8, and a mirrored decoder with a linear output. Train on normal examples only. Use Adam, gradient clipping, and early stopping on deterministic validation reconstruction error. Restore the best epoch.
-7. Set the threshold to the higher empirical 99th percentile of the independent normal calibration scores. Predict attack only when `score > threshold`. The configured 1% FPR is a calibration target, **not a guarantee of Friday's FPR**.
+7. Set the threshold to the higher empirical 99th percentile of the normal validation scores, recomputed after restoring the best model. Predict attack only when `score > threshold`. The configured 1% FPR is a calibration target, **not a guarantee of Friday's FPR**.
 8. Evaluate the frozen model and threshold on Friday. Repeat using three predetermined initialization seeds with identical data splits. Report each seed and mean/sample standard deviation; seed variation is not a confidence interval over network environments.
 
 The training loss averages over rows and sums within feature/latent dimensions:
@@ -113,6 +113,8 @@ Each run saves:
 | `seed_*/test_predictions.csv` | Row IDs, labels, scores, and decisions |
 | `seed_*/calibration_scores.csv`, `seed_*/pr_curve.csv` | Calibration audit and plot-ready precision-recall curve |
 | `metrics_by_seed.csv`, `summary.json`, `run.log` | Repeat-level results, aggregate results, readable progress |
+
+Threshold calibration reuses the model-selection validation set and is therefore not independent of model selection. This reuse is recorded in `data_audit.json` and the run log. `calibration_scores.csv` contains validation source row IDs and scores; the split manifest lists each row only once. Friday remains reserved for final evaluation.
 
 Average precision (AP) and trapezoidal PR-AUC are saved under separate names because their numerical definitions differ. Attack prevalence is included to contextualize precision and AP. No test-label tuning or test-set early stopping is performed.
 
