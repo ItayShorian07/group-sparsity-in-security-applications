@@ -127,3 +127,15 @@ The next controlled comparison can introduce RPCA, group-RPCA, and a carefully s
 The configured CSV files are present locally. Full CSVs are loaded into RAM, so memory grows with dataset size.
 
 Dataset citation: I. Sharafaldin, A. H. Lashkari, and A. A. Ghorbani, “Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization,” ICISSP, 2018.
+
+## Experiment 02: fully synthetic data
+
+The independent [second experiment](EXPERIMENT_02.md) generates `D = L(alpha) + S + N`
+and compares a normal-trained VAE with batch RPCA across five nonlinearity levels.
+It requires no dataset downloads and writes to `runs/experiment_02/`.
+
+```bash
+.venv/bin/python -m traffic_vae.experiment_02 --config experiment_02.json
+```
+
+See `EXPERIMENT_02.md` for the protocol, configuration, comparison limits, and outputs.
