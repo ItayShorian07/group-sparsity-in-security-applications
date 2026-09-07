@@ -18,7 +18,7 @@
   "beta": 0.01,
   "patience": 10,
   "target_fpr": 0.01,
-  "train_fraction": 0.7,
-  "validation_fraction": 0.15,
+  "train_fraction": 0.75,
+  "validation_fraction": 0.25,
   "threads": 4
 }
