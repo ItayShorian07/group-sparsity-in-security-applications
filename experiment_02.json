@@ -1,7 +1,17 @@
 {
   "output_dir": "runs/experiment_02",
-  "seeds": [17, 42, 2026],
-  "alphas": [0.0, 0.25, 0.5, 0.75, 1.0],
+  "seeds": [
+    17,
+    42,
+    2026
+  ],
+  "alphas": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
   "n_features": 50,
   "group_size": 5,
   "train_size": 6000,
@@ -12,7 +22,10 @@
   "attack_amplitude": 2.0,
   "attack_duration": 12,
   "attacked_time_fraction": 0.1,
-  "hidden_dims": [128, 64],
+  "hidden_dims": [
+    128,
+    64
+  ],
   "latent_dim": 3,
   "epochs": 100,
   "batch_size": 256,
@@ -22,6 +35,12 @@
   "target_fpr": 0.01,
   "rpca_sparse_penalty": 0.1,
   "rpca_max_iterations": 1000,
-  "rpca_tolerance": 0.00001,
-  "threads": 4
+  "rpca_tolerance": 1e-05,
+  "threads": 4,
+  "da_rank": 3,
+  "da_ridge_penalty": 1.0,
+  "da_sparse_penalty": 0.1,
+  "da_warmup_size": 128,
+  "da_max_iterations": 3000,
+  "da_tolerance": 1e-07
 }

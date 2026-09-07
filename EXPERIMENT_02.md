@@ -1,7 +1,7 @@
 # Experiment 02: fully synthetic nonlinearity sweep
 
 Question: as the normal signal becomes less compatible with a linear low-rank
-model, does a normal-trained VAE outperform batch RPCA in anomaly detection and
+model, does a normal-trained VAE outperform batch RPCA and an online low-rank tracker in anomaly detection and
 signal recovery? This experiment tests that hypothesis; it does not assume the
 answer. Group-sparse estimators are not part of this comparison yet.
 
@@ -115,9 +115,50 @@ of these two workflows, not a strictly isolated causal test of representation
 nonlinearity. A matched normal-trained linear baseline and penalty sensitivity
 study are needed before making broader claims of VAE superiority.
 
+## Online comparison with Dynamic Anomalography
+
+`OnlineDA` implements the coefficient and subspace updates from Algorithm 2 of
+[Mardani, Mateos, and Giannakis](https://arxiv.org/abs/1208.4043), equations (11)-(14),
+specialized to full observations, identity routing, and forgetting factor one.
+The original paper also handles routed/missing link observations. This experiment
+uses direct synthetic flows and does not reproduce the paper's topology or data.
+
+At each time point, Lasso estimates the sparse anomaly, ridge regression obtains
+latent coefficients, and accumulated sufficient statistics update the linear basis.
+The current estimate is formed before updating the basis with that observation.
+Subproblem KKT residuals and convergence flags are saved.
+
+The initialization is explicitly adapted: an SVD of the first 128 normal training
+samples seeds the basis and full-rank sufficient statistics. Random initialization
+with zero statistics under full observations can collapse the basis to rank one on
+the first update. This warm start avoids that numerical/structural degeneracy.
+Subsequent training samples are processed once in order. Validation and test start
+from independent copies of the trained state; both continue updating causally.
+Neither uses future samples or test labels. The offline VAE remains frozen at test.
+
+These adaptations mean this is an Algorithm-2-based comparison, not an exact
+reproduction of the paper's reported performance. In particular, the state rank
+is fixed to three to match the VAE bottleneck, and penalties are initial settings
+in our standardized units, not parameters tuned to reproduce the original figures.
+
+| Setting | Value |
+| --- | ---: |
+| `da_rank` | 3 |
+| `da_ridge_penalty` | 1.0 |
+| `da_sparse_penalty` | 0.1 |
+| `da_warmup_size` | 128 |
+| `da_max_iterations` | 3000 |
+| `da_tolerance` | 1e-7 |
+
+A tolerance of at least 1e-5 on the normalized Lasso KKT residual is checked
+independently of the coordinate-descent stopping rule. Subproblem convergence
+is not a certificate of optimality for the evolving nonconvex tracker.
+The Lasso objective scaling accounts for scikit-learn's mean squared-error
+convention by dividing its `alpha` by the number of design rows.
+
 ## Evaluation
 
-Both methods use a threshold calibrated on normal validation outputs, with target
+All methods use a threshold calibrated on normal validation outputs, with target
 FPR 1%. VAE also uses validation for early stopping, so calibration is not independent
 of model selection. No test-label hyperparameter tuning is performed.
 
@@ -134,7 +175,7 @@ Error_S = ||S_hat - S||_F / ||S||_F
 Precision, recall, F1, FPR, average precision, trapezoidal PR-AUC, ROC-AUC, prevalence,
 and confusion counts are saved at time, group-time, and element levels. These are
 cell-level metrics, not attack-event detection rates. Group metrics alone do not
-establish a benefit from group sparsity; neither estimator uses that penalty.
+establish a benefit from group sparsity; none of these estimators uses that penalty.
 
 The clean test matrix's singular values and ranks capturing 95% and 99% energy are
 reported. Alpha=0 is a low-rank sanity case. Numerical energy rank and model
@@ -148,11 +189,12 @@ performance are measured, not forced to change monotonically with alpha.
 - `seed_*/alpha_*/spectrum.json`: clean-signal singular values and energy ranks.
 - `seed_*/alpha_*/vae/`: model, training history, estimates, metrics.
 - `seed_*/alpha_*/rpca/`: solver diagnostics, convergence histories, estimates, metrics.
+- `seed_*/alpha_*/onlineda/`: training state, per-time Lasso diagnostics, estimates, metrics.
 - `metrics.csv`: one row per seed, alpha, and method; updated after each fit.
 - `summary.csv`: means and sample standard deviations across seeds.
-- `paired_vae_minus_rpca.csv`: per-seed method differences for each alpha.
+- `paired_vae_minus_rpca.csv`, `paired_vae_minus_online_da.csv`: paired method differences for each alpha.
 - `rank_diagnostics.csv`: ranks and component RMS values.
-- `completed.json`: completion marker, RPCA convergence status, plot status.
+- `completed.json`: completion marker, RPCA and online Lasso convergence status, plot status.
 
 Three seeds characterize only limited variability and are not a confidence interval
 for general network traffic. All estimates and truth are local generated artifacts

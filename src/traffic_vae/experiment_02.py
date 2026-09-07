@@ -1,4 +1,4 @@
-"""Experiment 02: fully synthetic nonlinearity sweep comparing VAE with RPCA."""
+"""Experiment 02: fully synthetic nonlinearity sweep comparing VAE, RPCA, and online anomalography."""
 import argparse
 import importlib.metadata
 import importlib.util
@@ -14,6 +14,7 @@ import pandas as pd
 import torch
 from threadpoolctl import threadpool_limits
 
+from .anomalography import OnlineAnomalography
 from .data import sha256
 from .evaluation import calibrate, evaluate
 from .experiment import write_json
@@ -30,20 +31,24 @@ def load_config(path: Path) -> dict:
         'attack_duration', 'attacked_time_fraction', 'hidden_dims', 'latent_dim',
         'epochs', 'batch_size', 'learning_rate', 'beta', 'patience', 'target_fpr',
         'rpca_sparse_penalty', 'rpca_max_iterations', 'rpca_tolerance', 'threads',
+        'da_rank', 'da_ridge_penalty', 'da_sparse_penalty', 'da_warmup_size',
+        'da_max_iterations', 'da_tolerance',
     }
     if set(config) != required:
         raise ValueError(f'Config fields: missing {required - set(config)}, unknown {set(config) - required}')
     for key in ('n_features', 'group_size', 'train_size', 'validation_size', 'test_size',
                 'period', 'attack_duration', 'latent_dim', 'epochs', 'batch_size',
-                'patience', 'rpca_max_iterations', 'threads'):
+                'patience', 'rpca_max_iterations', 'threads', 'da_rank', 'da_warmup_size', 'da_max_iterations'):
         if type(config[key]) is not int or config[key] < 1:
             raise ValueError(f'{key} must be a positive integer.')
     for key in ('noise_std', 'attack_amplitude', 'attacked_time_fraction', 'learning_rate',
-                'beta', 'target_fpr', 'rpca_sparse_penalty', 'rpca_tolerance'):
+                'beta', 'target_fpr', 'rpca_sparse_penalty', 'rpca_tolerance',
+                'da_ridge_penalty', 'da_sparse_penalty', 'da_tolerance'):
         value = config[key]
         if type(value) not in (int, float) or not np.isfinite(value) or value < 0:
             raise ValueError(f'{key} must be finite and nonnegative.')
-    for key in ('attack_amplitude', 'learning_rate', 'rpca_sparse_penalty', 'rpca_tolerance'):
+    for key in ('attack_amplitude', 'learning_rate', 'rpca_sparse_penalty', 'rpca_tolerance',
+                'da_ridge_penalty', 'da_sparse_penalty', 'da_tolerance'):
         if config[key] == 0:
             raise ValueError(f'{key} must be positive.')
     for key in ('target_fpr', 'attacked_time_fraction'):
@@ -71,6 +76,10 @@ def load_config(path: Path) -> dict:
     if not isinstance(config['output_dir'], str) or not config['output_dir'].strip():
         raise ValueError('output_dir must be a nonempty path.')
     config['output_dir'] = str(Path(config['output_dir']).expanduser().resolve())
+    if not config['da_rank'] <= config['da_warmup_size'] < config['train_size']:
+        raise ValueError('Require da_rank <= da_warmup_size < train_size.')
+    if config['da_rank'] > config['n_features']:
+        raise ValueError('da_rank must not exceed n_features.')
     slots = config['test_size'] // config['attack_duration']
     count = max(1, int(round(config['attacked_time_fraction'] * config['test_size'] / config['attack_duration'])))
     if not 1 <= count < slots:
@@ -134,7 +143,7 @@ def plot_results(table: pd.DataFrame, ranks: pd.DataFrame, output: Path):
     ax.set(xlabel='Nonlinearity alpha', title='Clean signal energy rank')
     ax.grid(alpha=.25)
     ax.legend()
-    fig.suptitle('Synthetic VAE vs batch RPCA | bars: SD across paired seeds')
+    fig.suptitle('Synthetic VAE, RPCA, OnlineDA | bars: SD across paired seeds')
     fig.tight_layout()
     fig.savefig(output / 'comparison.png', dpi=180)
     fig.savefig(output / 'comparison.pdf')
@@ -158,7 +167,8 @@ def run(config: dict) -> Path:
             'versions': {key: importlib.metadata.version(key) for key in
                          ('numpy', 'pandas', 'torch', 'scikit-learn', 'threadpoolctl')},
             'source_sha256': {p.name: sha256(p) for p in sorted(Path(__file__).parent.glob('*.py'))},
-            'protocol': 'VAE normal-only training; RPCA separate transductive validation/test decompositions',
+            'protocol': 'VAE normal-only; RPCA batch; OnlineDA Algorithm-2 updates, R=I, Omega=I, normal-prefix SVD initialization',
+            'online_reference': 'https://arxiv.org/abs/1208.4043',
             'calibration_source': 'normal validation, shared with VAE early stopping',
         })
         torch.set_num_threads(config['threads'])
@@ -194,11 +204,12 @@ def run(config: dict) -> Path:
                                       'clean_rms': float(np.sqrt(np.mean(clean['test']**2))),
                                       'noise_rms': float(np.sqrt(np.mean(base.noise['test']**2))),
                                       'attack_rms': float(np.sqrt(np.mean(base.attacks**2)))})
-                    for method in ('VAE', 'RPCA'):
+                    for method in ('VAE', 'RPCA', 'OnlineDA'):
                         started = time.perf_counter()
                         method_dir = directory / method.lower()
                         method_dir.mkdir()
                         solver_ok = True
+                        online_ok = None
                         if method == 'VAE':
                             torch.manual_seed(seed)
                             model = VAE(config['n_features'], config['hidden_dims'], config['latent_dim'])
@@ -211,7 +222,7 @@ def run(config: dict) -> Path:
                             torch.save({'state_dict': model.state_dict(), 'input_dim': config['n_features'],
                                         'hidden_dims': config['hidden_dims'], 'latent_dim': config['latent_dim']},
                                        method_dir / 'model.pt')
-                        else:
+                        elif method == 'RPCA':
                             logger.info('Seed %d | alpha %.4f | batch RPCA validation and test', seed, alpha)
                             results = {}
                             for split in ('validation', 'test'):
@@ -230,6 +241,34 @@ def run(config: dict) -> Path:
                                         'relative_gradient_mapping': r.history[-1]['relative_gradient_mapping'],
                                         'nuclear_penalty': r.nuclear_penalty, 'sparse_penalty': r.sparse_penalty}
                                 for split, r in results.items()})
+                        else:
+                            logger.info('Seed %d | alpha %.4f | online anomalography, full observations', seed, alpha)
+                            tracker = OnlineAnomalography(config['da_rank'], config['da_ridge_penalty'],
+                                                          config['da_sparse_penalty'], config['da_max_iterations'],
+                                                          config['da_tolerance'])
+                            warmup = config['da_warmup_size']
+                            tracker.initialize(arrays['train'][:warmup])
+                            training_result = tracker.process(arrays['train'][warmup:])
+                            np.savez(method_dir / 'training_state.npz', basis=tracker.basis,
+                                     gram=tracker.gram, cross=tracker.cross)
+                            results = {'train': training_result}
+                            # Independent copies prevent validation-to-test state leakage.
+                            for split in ('validation', 'test'):
+                                results[split] = tracker.copy().process(arrays[split])
+                            low, sparse = results['test'].low_rank, results['test'].sparse
+                            calibration_sparse = results['validation'].sparse
+                            diagnostics = {}
+                            for split, result in results.items():
+                                pd.DataFrame(result.history).to_csv(method_dir / f'{split}_history.csv', index=False)
+                                diagnostics[split] = {
+                                    'all_subproblems_converged': all(row['converged'] for row in result.history),
+                                    'unconverged_count': sum(not row['converged'] for row in result.history),
+                                    'max_relative_kkt_residual': max(row['relative_kkt_residual'] for row in result.history),
+                                }
+                            online_ok = all(d['all_subproblems_converged'] for d in diagnostics.values())
+                            if not online_ok:
+                                logger.warning('OnlineDA contains unconverged Lasso subproblems; inspect solver.json')
+                            write_json(method_dir / 'solver.json', diagnostics)
                         # Report recovery in the original generator units.
                         estimated_clean = low * scale + mean
                         estimated_attack = sparse * scale
@@ -237,6 +276,7 @@ def run(config: dict) -> Path:
                                                    config['group_size'], config['target_fpr'])
                         values.update(seed=seed, alpha=alpha, method=method,
                                       rpca_converged=solver_ok if method == 'RPCA' else None,
+                                      online_subproblems_converged=online_ok,
                                       elapsed_seconds=time.perf_counter() - started,
                                       relative_error_L=float(np.linalg.norm(estimated_clean - clean['test']) / np.linalg.norm(clean['test'])),
                                       relative_error_S=float(np.linalg.norm(estimated_attack - base.attacks) / np.linalg.norm(base.attacks)))
@@ -260,13 +300,16 @@ def run(config: dict) -> Path:
         paired = table.pivot(index=['seed', 'alpha'], columns='method', values=numeric)
         differences = pd.DataFrame({key: paired[(key, 'VAE')] - paired[(key, 'RPCA')] for key in numeric})
         differences.to_csv(output / 'paired_vae_minus_rpca.csv')
+        online_differences = pd.DataFrame({key: paired[(key, 'VAE')] - paired[(key, 'OnlineDA')] for key in numeric})
+        online_differences.to_csv(output / 'paired_vae_minus_online_da.csv')
         plots_available = importlib.util.find_spec('matplotlib') is not None
         if plots_available:
             plot_results(table, ranks, output)
         else:
             logger.info('Optional Matplotlib is absent; plot-ready CSV results were saved')
         write_json(output / 'completed.json', {'runs': len(table), 'plots_created': plots_available,
-                   'all_rpca_converged': bool(table.loc[table.method == 'RPCA', 'rpca_converged'].all())})
+                   'all_rpca_converged': bool(table.loc[table.method == 'RPCA', 'rpca_converged'].all()),
+                   'all_online_subproblems_converged': bool(table.loc[table.method == 'OnlineDA', 'online_subproblems_converged'].all())})
         logger.info('Completed experiment 02 | results: %s', output)
         return output
     except Exception:

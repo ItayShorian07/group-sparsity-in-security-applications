@@ -131,7 +131,8 @@ Dataset citation: I. Sharafaldin, A. H. Lashkari, and A. A. Ghorbani, “Toward 
 ## Experiment 02: fully synthetic data
 
 The independent [second experiment](EXPERIMENT_02.md) generates `D = L(alpha) + S + N`
-and compares a normal-trained VAE with batch RPCA across five nonlinearity levels.
+and compares a normal-trained VAE with batch RPCA and an Algorithm-2-based online
+anomalography tracker across five nonlinearity levels.
 It requires no dataset downloads and writes to `runs/experiment_02/`.
 
 ```bash
