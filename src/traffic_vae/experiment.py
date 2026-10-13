@@ -152,8 +152,8 @@ def run(config: dict) -> Path:
             summary[key] = {"mean": float(table[key].mean()),
                             "std_across_seeds": float(table[key].std(ddof=1)) if len(table) > 1 else None}
         write_json(output / "summary.json", summary)
-        logger.info("Completed | F1 %.4f | AP %.4f | artifacts: %s",
-                    summary["f1"]["mean"], summary["average_precision"]["mean"], output)
+        logger.info("Completed | recall %.4f | F1 %.4f | AP %.4f | artifacts: %s",
+                    summary["recall"]["mean"], summary["f1"]["mean"], summary["average_precision"]["mean"], output)
         return output
     except Exception:
         logger.exception("Experiment failed; partial artifacts are retained for diagnosis")

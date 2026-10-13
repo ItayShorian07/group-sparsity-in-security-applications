@@ -128,15 +128,33 @@ The configured CSV files are present locally. Full CSVs are loaded into RAM, so 
 
 Dataset citation: I. Sharafaldin, A. H. Lashkari, and A. A. Ghorbani, “Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization,” ICISSP, 2018.
 
-## Experiment 02: fully synthetic data
+## Experiment 02: paper-model synthetic data
 
-The independent [second experiment](EXPERIMENT_02.md) generates `D = L(alpha) + S + N`
-and compares a normal-trained VAE with batch RPCA and an Algorithm-2-based online
-anomalography tracker across five nonlinearity levels.
-It requires no dataset downloads and writes to `runs/experiment_02/`.
+The independent [second experiment](EXPERIMENT_02.md) uses the 15-node,
+52-directed-link, 210-OD-flow synthetic model described in Section VI-A of
+*Dynamic Anomalography* at gamma=0. Our nonlinear extension supplies the higher
+gamma values. Following the paper, alpha is reserved for routing-change probability.
+A normal-trained VAE with routing-aware sparse decoding is compared
+with Algorithm-2-based online anomalography on the same link observations.
+The VAE learns only nominal traffic; attacks are inferred from its residual by
+the same elementwise L1 routing decoder used for the comparison. The paper does
+not define attack groups, so Group Lasso is deliberately left out of this main
+paper-faithful experiment.
+
+The code creates new samples from the paper's stated random model; the paper does
+not provide the exact sampled graph, matrices, arrays, or random seed. No dataset
+download is required. Results are written to `runs/experiment_02_paper/`.
 
 ```bash
 .venv/bin/python -m traffic_vae.experiment_02 --config experiment_02.json
 ```
 
+The routing-change, missing-link, and noise scenarios reported around Figure 4
+are configured separately:
+
+```bash
+.venv/bin/python -m traffic_vae.paper_tracking --config experiment_02_tracking.json
+```
+
 See `EXPERIMENT_02.md` for the protocol, configuration, comparison limits, and outputs.
+The previous 50-channel generator remains available in `experiment_02_legacy.json`.

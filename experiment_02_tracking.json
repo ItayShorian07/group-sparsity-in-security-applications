@@ -1,0 +1,34 @@
+{
+  "base_config": "experiment_02.json",
+  "output_dir": "runs/experiment_02_tracking",
+  "seeds": [17, 42, 2026],
+  "test_size": 1000,
+  "gammas": [0],
+  "da_forgetting_factor": 0.9,
+  "scenarios": [
+    {
+      "name": "slow_noisy_missing",
+      "routing_alpha": 0.01,
+      "observation_probability": 0.8,
+      "noise_std": 0.01
+    },
+    {
+      "name": "slow_low_noise_missing",
+      "routing_alpha": 0.01,
+      "observation_probability": 0.8,
+      "noise_std": 0.00001
+    },
+    {
+      "name": "fast_low_noise_missing",
+      "routing_alpha": 0.1,
+      "observation_probability": 0.8,
+      "noise_std": 0.00001
+    },
+    {
+      "name": "slow_low_noise_full",
+      "routing_alpha": 0.01,
+      "observation_probability": 1,
+      "noise_std": 0.00001
+    }
+  ]
+}

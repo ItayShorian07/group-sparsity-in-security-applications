@@ -18,6 +18,14 @@ __pycache__/
 build/
 dist/
 
+# LaTeX build artifacts (the reviewed PDF is kept under output/pdf/)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+/survey_with_experiments.pdf
+
 # Local credentials, editor settings, and operating system files
 .env
 .env.*

@@ -285,14 +285,15 @@ def run(config: dict) -> Path:
                                             S_hat=estimated_attack, calibration_sparse=calibration_sparse)
                         metrics_rows.append(values)
                         pd.DataFrame(metrics_rows).to_csv(output / 'metrics.csv', index=False)
-                        logger.info('%s | alpha %.2f | F1 %.4f | AP %.4f | FPR %.4f | L error %.4f',
-                                    method, alpha, values['time_f1'], values['time_average_precision'],
+                        logger.info('%s | alpha %.2f | recall %.4f | F1 %.4f | AP %.4f | FPR %.4f | L error %.4f',
+                                    method, alpha, values['time_recall'], values['time_f1'], values['time_average_precision'],
                                     values['time_false_positive_rate'], values['relative_error_L'])
         table = pd.DataFrame(metrics_rows)
         ranks = pd.DataFrame(rank_rows)
         ranks.to_csv(output / 'rank_diagnostics.csv', index=False)
-        numeric = ['time_f1', 'time_false_positive_rate', 'time_average_precision',
-                   'group_f1', 'group_average_precision', 'relative_error_L', 'relative_error_S']
+        numeric = ['time_recall', 'time_f1', 'time_false_positive_rate', 'time_average_precision',
+                   'group_recall', 'group_f1', 'group_average_precision', 'element_recall',
+                   'relative_error_L', 'relative_error_S']
         summary = table.groupby(['alpha', 'method'])[numeric].agg(['mean', 'std'])
         summary.columns = ['_'.join(column) for column in summary.columns]
         summary.to_csv(output / 'summary.csv')
@@ -324,9 +325,44 @@ def run(config: dict) -> Path:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', type=Path, default=Path('experiment_02.json'))
+    parser.add_argument('--output-dir', type=Path,
+                        help='Use a new output directory; existing directories are refused.')
+    parser.add_argument('--alphas', type=float, nargs='+',
+                        help='Override legacy nonlinearity levels; unavailable for paper_routed.')
+    parser.add_argument('--gammas', type=float, nargs='+',
+                        help='Override paper-protocol nonlinearity levels; must include zero.')
+    parser.add_argument('--validate-only', action='store_true',
+                        help='Check settings without generating data or training.')
     args = parser.parse_args()
     try:
-        run(load_config(args.config))
+        is_paper = json.loads(args.config.read_text()).get('data_model') == 'paper_routed'
+        if is_paper:
+            from . import paper_experiment
+
+            config = paper_experiment.load_config(args.config)
+            runner = paper_experiment.run
+            if args.alphas is not None:
+                raise ValueError('--alphas is legacy-only; use --gammas for the paper protocol.')
+            if args.gammas is not None:
+                paper_experiment.validate_gammas(args.gammas)
+                config['gammas'] = args.gammas
+        else:
+            config = load_config(args.config)
+            runner = run
+            if args.gammas is not None:
+                raise ValueError('--gammas is supported only for the paper_routed protocol.')
+            if args.alphas is not None:
+                config['alphas'] = args.alphas
+        if args.output_dir is not None:
+            config['output_dir'] = str(args.output_dir.expanduser().resolve())
+        if args.validate_only:
+            protocol = 'paper_routed' if is_paper else 'legacy'
+            levels = config['gammas'] if is_paper else config['alphas']
+            label = 'gammas' if is_paper else 'alphas'
+            print(f"Configuration valid | protocol: {protocol} | {label}: {levels}")
+            print(f"Output: {config['output_dir']} | no data generated or models trained")
+        else:
+            runner(config)
     except (ValueError, FileNotFoundError, FileExistsError) as error:
         parser.exit(2, f'Error: {error}\n')
 
