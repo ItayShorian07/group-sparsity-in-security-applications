@@ -1,0 +1,19 @@
+{
+  "real_source": "runs/experiment_01",
+  "synthetic_source": "runs/experiment_02_paper",
+  "output_dir": "runs/experiment_03_full",
+  "normal_csv": "data/TrafficLabelling/Monday-WorkingHours.pcap_ISCX.csv",
+  "test_csv": "data/TrafficLabelling/Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv",
+  "seeds": [17, 42, 2026],
+  "synthetic_gamma_indices": [0, 1, 2, 3, 4],
+  "real_window_seconds": 60,
+  "real_penalty_multipliers": [0.5, 1.0, 2.0],
+  "real_primary_multiplier": 1.0,
+  "synthetic_penalty": 0.11,
+  "matched_attacked_times": 300,
+  "target_fpr": 0.01,
+  "group_max_iterations": 10000,
+  "group_kkt_tolerance": 0.00001,
+  "batch_size": 256,
+  "threads": 4
+}

@@ -1,0 +1,15 @@
+{
+  "paper_config": "experiment_02.json",
+  "group_config": "experiment_03.json",
+  "original_source": "runs/experiment_02_paper",
+  "output_dir": "runs/high_rank_sensitivity",
+  "fourier_modes": [[1, 0], [0, 1], [1, 1], [1, -1], [2, 0], [0, 2], [2, 1], [1, 2]],
+  "generator_seed_namespace": 4040,
+  "minimum_training_rank_95": 12,
+  "maximum_training_top5_energy": 0.5,
+  "online_rank_control": 16,
+  "primary_metric": "flow_f1",
+  "secondary_metric": "flow_average_precision",
+  "test_label_parameter_selection": false,
+  "replace_original_results": false
+}

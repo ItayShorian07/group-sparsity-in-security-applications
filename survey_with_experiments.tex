@@ -8,6 +8,24 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{float}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\usepackage[justification=justified,singlelinecheck=false]{caption}
+\setlength{\parindent}{0pt}
+\setlist[itemize]{leftmargin=0pt,itemindent=0pt,listparindent=0pt}
+\captionsetup{margin=0pt,indention=0pt}
+% Keep prose flush with the text margin, including special environments.
+\patchcmd{\abstract}{\quotation}{}{}
+  {\PackageError{survey}{Abstract alignment patch failed}{}}
+\patchcmd{\endabstract}{\endquotation}{}{}
+  {\PackageError{survey}{Abstract alignment patch failed}{}}
+\patchcmd{\thebibliography}{\leftmargin\labelwidth}
+  {\leftmargin0pt\labelwidth0pt\itemindent\labelsep
+   \let\makelabel\textnormal}{}
+  {\PackageError{survey}{Bibliography alignment patch failed}{}}
+\patchcmd{\thebibliography}{\advance\leftmargin\labelsep}
+  {}{}
+  {\PackageError{survey}{Bibliography alignment patch failed}{}}
 \hypersetup{hypertexnames=false}
 
 % This block creates the .bib file automatically with the references
@@ -93,6 +111,32 @@
   institution={Texas A\&M University},
   note={Technical Report}
 }
+@article{Tseng2001,
+  author={Tseng, Paul},
+  title={Convergence of a Block Coordinate Descent Method for Nondifferentiable Minimization},
+  journal={Journal of Optimization Theory and Applications},
+  volume={109},
+  number={3},
+  pages={475--494},
+  year={2001},
+  doi={10.1023/A:1017501703105}
+}
+@article{YuanLin2006,
+  author={Yuan, Ming and Lin, Yi},
+  title={Model selection and estimation in regression with grouped variables},
+  journal={Journal of the Royal Statistical Society: Series B},
+  volume={68},
+  number={1},
+  pages={49--67},
+  year={2006},
+  doi={10.1111/j.1467-9868.2005.00532.x}
+}
+@misc{CICIDS2017,
+  author={{Canadian Institute for Cybersecurity}},
+  title={Intrusion Detection Evaluation Dataset (CICIDS2017)},
+  year={2017},
+  howpublished={\url{https://www.unb.ca/cic/datasets/ids-2017.html}}
+}
 \end{filecontents}
 \title{\textbf{Survey on Group Sparsity in Security Applications}}
 \author{Itay Shorian \\ Advisor: Dr.\ Nadav Hallak}
@@ -100,6 +144,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
+\noindent
 This survey reviews the application of Group Sparsity in security-oriented systems. We classify applications into four domains: Cyber-Physical Systems, Network Traffic Analysis, Smart Grids, and Biometric Security. For each domain, we present the mathematical formulation, the optimization model, and the algorithmic solution utilized to detect and mitigate threats. Additionally, we discuss emerging applications in detecting algorithmically generated malicious domains.
 \end{abstract}
 
@@ -175,9 +220,7 @@ The relationship between quality measurements $y$ and the fault sources $u$ is m
 \]
 where $u_k$ represents the fault vector associated with the $k$-th manufacturing stage. By using the $\ell_{2,1}$ norm, the estimator enforces sparsity at the stage level rather than the sensor level.
 \textbf{Algorithmic Solution:} This problem is typically solved using \textit{Block Coordinate Descent (BCD)}. The algorithm iteratively optimizes a single block (stage) $u_k$ while keeping others fixed.
-\textit{Theoretical Guarantee:} Since the objective function is convex and the non-smooth
-part is separable across blocks, Block Coordinate Descent is guaranteed to converge to a
-global optimum of the problem.
+\textit{Convergence conditions:} For the displayed quadratic loss with disjoint group penalties, cyclic exact BCD has globally optimal accumulation points if its initial level set is compact and every block subproblem has a unique minimizer~\cite{Tseng2001}. These sufficient conditions must be checked; convexity alone does not justify the convergence claim.
 
 \subsection{Network Traffic Anomaly Detection}
 
@@ -213,9 +256,7 @@ To address this, \textit{Locality-constrained Group Sparse Representation (LGSR)
 \]
 where $y$ is the test sample, $A$ is the training dictionary, and $d$ is a locality adaptor vector. The term $\|e\|_{2,1}$ specifically enforces the error to be concentrated in spatial blocks.
 \textbf{Algorithmic Solution:} The problem is solved using an iterative alternating minimization strategy.
-\textit{Theoretical Guarantee:} Since the dictionary $A$ is fixed during the recognition
-phase, the optimization problem is convex with respect to $x$ and $e$, and the alternating
-minimization algorithm is guaranteed to converge to a global minimizer of the objective.
+\textit{Convergence conditions:} The displayed fixed-dictionary objective has smooth convex coupling and a block-separable nonsmooth penalty. Under the preceding exact-update, compactness, and block-uniqueness conditions, alternating block minimization has globally optimal accumulation points~\cite{Tseng2001}. Fixing $A$ alone does not establish these conditions or a unique coefficient vector.
 
 \subsection{Detection of Algorithmically Generated Malicious Domains}
 
@@ -227,9 +268,7 @@ The classification problem is formulated as a supervised learning task using \te
 \]
 Here, the $\ell_1$ regularization term enforces sparsity, selecting only the most discriminative statistical features.
 \textbf{Algorithmic Solution:} The problem is solved using coordinate descent methods (e.g., \texttt{glmnet}).
-\textit{Theoretical Guarantee:} For the convex Lasso objective, coordinate descent is
-guaranteed to converge to a minimizer of the objective function. The resulting sparse
-solution selects a subset of informative statistical features for classification.
+\textit{Convergence conditions:} For squared-loss Lasso, the $\ell_1$ term is coordinate-separable. Global optimality of accumulation points follows under the preceding exact cyclic-update and regularity conditions~\cite{Tseng2001}, not from convexity alone. This does not guarantee unique coefficients or correct feature selection.
 
 
 \section{Discussion}
@@ -259,7 +298,10 @@ Addressing these gaps requires the development of adaptive, graph-aware, and com
 
 \section{Experimental Evaluation and Interpretation}
 
-To complement the literature review, we conducted two empirical studies that examine how anomaly-detection models behave under realistic distribution shift and under a controlled transition from linear to nonlinear nominal traffic. The purpose of these experiments is not to replace the theoretical survey, but to test several of its main assumptions: first, that reconstruction-based anomaly detection can identify abnormal traffic from normal-only training data; and second, that low-rank sparse models may become less suitable when the normal component is generated by a nonlinear low-dimensional mechanism.
+Three studies examine normal-only anomaly detection under cross-day distribution
+shift, a controlled linear-to-nonlinear transition, and the added value of an
+explicit group-sparse decoder. Experiments 1 and 2 establish the baselines;
+Experiment 3 compares ordinary and grouped penalties using the same frozen VAEs.
 
 \subsection{Experiment 1: VAE Detection on CICIDS2017}
 
@@ -292,14 +334,9 @@ ROC-AUC & 0.7196 & 0.0150 \\
 \end{tabular}
 \end{table}
 
-The results show that the VAE detects a large portion of DDoS flows, with an average recall of 84.13\%. However, this comes at the cost of a high false-positive rate on benign Friday traffic: about 31.92\% of benign flows are incorrectly flagged as attacks. In operational terms, out of every 1,000 test flows, the model detects roughly 478 attacks, misses 90 attacks, incorrectly flags 138 benign flows, and correctly accepts 294 benign flows.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/experiment_01_metrics_and_confusion.png}
-\caption{Summary metrics and average confusion matrix for the VAE on CICIDS2017.}
-\label{fig:exp1_metrics}
-\end{figure}
+The VAE detects 84.13\% of DDoS flows, but incorrectly flags 31.92\% of benign
+Friday flows. The three seeds measure sensitivity to model training, not
+variation across independent traffic captures.
 
 The main explanation for this behavior is distribution shift between the Monday benign traffic used for training and calibration and the Friday benign traffic used during testing. Although the VAE learned the Monday normal distribution well, the benign Friday flows exhibit much larger reconstruction errors. The median anomaly score rises from 0.164 on Monday validation traffic to 0.404 on Friday benign traffic, while the 90th percentile rises from 0.557 to 7.456. Therefore, many benign Friday flows lie far outside the calibrated Monday normal region.
 
@@ -310,25 +347,16 @@ The main explanation for this behavior is distribution shift between the Monday 
 \label{fig:exp1_scores}
 \end{figure}
 
-Further analysis shows that the false positives are concentrated in traffic subpopulations whose properties changed substantially between Monday and Friday. For example, the proportion of flows with a positive URG flag increases from 6.12\% in Monday training to 32.61\% in Friday benign traffic. Similarly, high destination ports and source ports 80 or 443 become much more common on Friday. These metadata variables were not used directly as model inputs; rather, they indicate that the Friday benign population contains traffic patterns that are structurally different from those learned during training.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/experiment_01_shift_and_false_positives.png}
-\caption{Distribution-shift diagnostics and concentration of false positives in shifted benign subgroups.}
-\label{fig:exp1_shift}
-\end{figure}
+False positives concentrate in shifted benign subpopulations. For example,
+positive URG flags rise from 6.12\% of Monday training flows to 32.61\% of
+Friday benign flows. Ports also change in prevalence, although ports and
+identifiers were excluded from VAE input.
 
 A threshold-sensitivity analysis confirms that the problem cannot be solved simply by choosing a more conservative threshold. Raising the threshold reduces the Friday false-positive rate only moderately, while recall drops sharply. For example, moving from a 1\% to a 0.1\% target false-positive rate on Monday validation reduces the Friday false-positive rate from 31.92\% to 26.22\%, but recall falls from 84.13\% to 33.93\%.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\textwidth]{figures/experiment_01_threshold_sensitivity.png}
-\caption{Threshold sensitivity for Experiment 1. More conservative calibration reduces recall much faster than it reduces cross-day false positives.}
-\label{fig:exp1_threshold}
-\end{figure}
-
-The conclusion from Experiment 1 is that a normal-only VAE can identify many DDoS flows, but the current calibration procedure is not robust to cross-day benign distribution shift. This result is important for the survey because it shows a practical limitation of reconstruction-based anomaly detection: learning a nonlinear normal model is not sufficient if the definition of ``normal'' changes between training and deployment. In security systems, this motivates adaptive calibration, context-aware scoring, and structured models that can distinguish attack residuals from benign changes in traffic composition.
+Thus learning normal traffic nonlinearly does not ensure cross-day calibration.
+Experiment 3 reuses these exact scores to test whether destination-time groups
+help distinguish attacks from benign changes.
 
 % The following block documents the superseded 50-channel pilot and is excluded
 % from the compiled report.  The paper-routed experiment follows after \fi.
@@ -444,7 +472,7 @@ This matches the published dimensions and distributions but not the authors'
 unpublished random realization.  The main sweep uses static routing and full
 link observations.  It contains 6,000 normal training samples, 2,000 normal
 validation samples, 2,000 independent normal calibration samples, and 4,000
-attacked test samples per seed.
+test samples with injected attacks per seed.
 
 The paper itself assumes a linear low-rank nominal component.  Our extension
 introduces a separate nonlinearity parameter $\gamma$ while reserving $\alpha$
@@ -546,21 +574,9 @@ changes.  Both deteriorate strongly relative to static routing.  The VAE models
 raw link observations and is not conditioned explicitly on $R_t$ or the missing
 data mask, which limits invariance to topology and observation changes.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.98\textwidth]{figures/experiment_02_paper_tracking.png}
-\caption{Flow localization under the four routing, missing-link, and noise
-settings adapted from the paper.}
-\label{fig:exp2_paper_tracking}
-\end{figure}
-
-Group sparsity is deliberately not inserted into this main comparison.  The
-reference objective uses the elementwise penalty $\|A\|_1$, and its synthetic
-attacks are drawn independently; it defines neither attack groups nor a
-Group-Lasso estimator.  A defensible group-sparse experiment must first define
-externally meaningful groups---for example common source, destination, service,
-subnet, or temporal campaign---and supply attacks structured at that same level.
-It is a separate extension, not a correction to the paper.
+The reference objective uses elementwise $\|A\|_1$ and independent attacks, not
+Group Lasso. This baseline is retained unchanged; destination-grouped decoding
+and matched structured attacks are introduced separately in Experiment 3.
 
 Finally, the article's real Internet2 experiment cannot be reproduced exactly
 from the publication alone.  The authors' traffic files, topology snapshot,
@@ -568,30 +584,238 @@ observation masks, pseudo-ground-truth output, and random seed are not distribut
 with the paper.  Substituting another Internet2/Abilene archive would be a new
 experiment and is therefore not presented as a reproduction here.
 
+\subsection{Experiment 3: VAE with Ordinary versus Grouped Sparse Decoding}
+
+This extension directly tests the proposed combination of a nonlinear normal
+model and a group-sparsity optimization stage. The two VAE decoders reuse the
+same frozen model within each seed and setting; no additional VAE is trained.
+OnlineDA is a third baseline in the synthetic arm only. The
+seeds remain 17, 42, and 2026. Two complementary arms use the recorded flows
+from Experiment 1 and the routed synthetic network from Experiment 2. They
+answer different questions and are not presented as the same inverse problem.
+
+\subsubsection{Recorded CICIDS2017 flows: destination-time score denoising}
+
+The CICIDS2017 capture supplies flow labels, destination IPs, and timestamps
+\cite{CICIDS2017}. We reuse exactly the 114,806 Monday validation scores and
+225,104 Friday test scores from Experiment 1, checking CSV hashes and row IDs.
+Groups contain flows to the same destination in a fixed 60-second wall-clock
+window. Labels do not determine groups; IPs and timestamps remain excluded from
+VAE inputs. Windows are evaluated after completion, so this is an offline
+procedure rather than an immediate per-flow alarm.
+
+There is no measured link-to-OD routing matrix in these flow CSVs. We therefore
+test an explicitly limited \emph{score-denoising} model, not physical OD attack
+recovery. Let $s_i$ be the original VAE reconstruction norm. The alternatives are
+\[
+ \min_b\frac12\|s-b\|_2^2+\lambda\mathcal R(b),\qquad
+ \mathcal R(b)=\|b\|_1\quad\hbox{or}\quad
+ \sum_g\sqrt{|G_g|}\,\|b_{G_g}\|_2.
+\]
+The group penalty follows the size-weighted Group-Lasso construction
+\cite{YuanLin2006}. With identity design, the solutions are exact soft
+thresholding and block soft thresholding. In particular,
+\[
+ \hat b_{G_g}=\left(1-\frac{\lambda\sqrt{|G_g|}}
+ {\|s_{G_g}\|_2}\right)_+s_{G_g},
+\]
+with zero output for a zero-norm block. These outputs are anomaly scores,
+not attack-volume estimates. The primary $\lambda$ is the normal-score median
+for each VAE. Multipliers $0.5,1,2$ are reported as a fixed sensitivity grid;
+the primary multiplier remains 1, without selection on test labels.
+
+Each method uses its normal-score 99th percentile as the flow threshold.
+Group scores are block root-mean-square values, calibrated on normal groups;
+a group is positive when it contains at least one labeled attack. As in
+Experiment 1, Monday validation was also used for VAE early stopping, so this
+arm has no independently reserved calibration split. There are 8,349 test
+groups, only 22 of which contain attacks. All 22 also contain benign flows.
+The median group size is 2, the maximum is 8,252, and 42.1\% are singletons.
+
+\begin{table}[H]
+\centering
+\caption{Experiment 3 on recorded flows: primary-setting means across three
+frozen VAE seeds. FPR refers to benign Friday flows.}
+\begin{tabular}{lcc}
+\toprule
+Metric & VAE+Lasso & VAE+Group Lasso \\
+\midrule
+Flow precision & 0.7767 & 0.7715 \\
+Flow recall & 0.8413 & 0.8477 \\
+Flow F1 & 0.8076 & 0.8078 \\
+Flow FPR & 0.3192 & 0.3312 \\
+Flow average precision & 0.6353 & 0.6349 \\
+Group F1 & 0.2386 & 0.2386 \\
+Group average precision & 0.1700 & 0.1690 \\
+\bottomrule
+\end{tabular}
+\label{tab:exp3_real}
+\end{table}
+
+The F1 difference is only 0.0002, while FPR increases by about 1.20 percentage
+points. Across the sensitivity grid, the largest mean F1 gain is below 0.0011
+and flow average precision does not improve. Ordinary score soft thresholding
+leaves the calibrated flow decisions unchanged here, explaining its agreement
+with the plain VAE baseline. For the grouped identity model, block RMS is
+itself merely soft thresholded; group rankings therefore do not acquire new
+information. This sanity check does not demonstrate an effective learned
+group-aware traffic model or removal of cross-day distribution shift.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/experiment_03_real_comparison.png}
+\caption{Recorded-flow comparison. Circles, squares, and triangles identify
+seeds 17, 42, and 2026; diamonds and error bars show the mean and one sample
+standard deviation. These are model seeds on one capture, not independent
+datasets.}
+\label{fig:exp3_real}
+\end{figure}
+
+\subsubsection{Routed synthetic traffic: original attacks and matched controls}
+
+We reuse all 15 VAE checkpoints from Experiment 2: three seeds at all five
+$\gamma$ values. The topology, nominal signal, noise, and original attack
+arrays are unchanged. Groups are the 15 destination nodes, each containing
+14 incoming OD flows, defined from topology rather than attack labels.
+After normal reconstruction, both decoders receive the identical residual
+$r_t=y_t-\hat\ell_t$ and solve
+\[
+ \min_a\frac12\|r_t-Ra\|_2^2+0.11\mathcal R(a),\qquad
+ \mathcal R(a)=\|a\|_1\quad\hbox{or}\quad
+ \sum_{g=1}^{15}\sqrt{14}\,\|a_{G_g}\|_2.
+\]
+The VAE stays frozen; this is a two-stage estimator, not end-to-end training
+through a differentiable optimization layer. The fixed penalties and size
+weights are specified before evaluation and are not claimed to be optimal.
+
+The third method is the same Algorithm-2 OnlineDA implementation as in
+Experiment 2~\cite{Mardani}: rank 5, ridge penalty 0.36, $\ell_1$ penalty
+0.11, and forgetting factor 1. It receives the same link observations and $R$,
+not VAE residuals. Each test scenario and normal-calibration stream starts from
+an independent copy of its normal-trained state. The normal-prefix SVD warm
+start remains an explicit adaptation to the paper's random initialization.
+OnlineDA adapts causally during testing, whereas the VAE is frozen; this third
+comparison is a whole-system benchmark, not an isolated test of the penalty.
+
+Three scenarios distinguish reuse from the new group-structured hypothesis.
+\emph{Original independent attacks} are exactly those of Experiment 2.
+\emph{Matched dispersed attacks} affect 14 distinct, uniformly sampled flows
+at each of 300 randomly selected times. \emph{Destination-grouped attacks}
+affect all 14 incoming flows to one randomly selected destination at those
+same 300 times. Both matched scenarios use positive unit amplitudes: they
+have identical time support, 4,200 attacked cells out of 840,000 (0.5\%), and
+OD attack energy. The dispersed control is sampled without replacement at a
+fixed count, not by independent Bernoulli draws. Routed link energy can still
+differ because paths overlap; it is recorded rather than assumed equal.
+New attacks are paired across $\gamma$ within each seed.
+
+Flow and destination-group thresholds use the same 2,000 independent normal
+calibration observations as Experiment 2, targeting 1\% FPR separately for
+each method and level. Group scores are L2 norms. Zero-score ties make the
+achieved calibration FPR conservative, including zero for the grouped decoder
+at $\gamma=0$. Average precision (AP) is therefore reported alongside F1.
+Compare methods within a scenario: group prevalence differs between scenarios.
+
+\begin{table}[H]
+\centering
+\caption{Experiment 3: synthetic endpoint means. L denotes VAE+Lasso,
+G denotes VAE+Group Lasso, and O denotes OnlineDA. F1 uses normal-calibrated
+thresholds.}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llcccccc}
+\toprule
+ & & \multicolumn{3}{c}{OD-flow F1} & \multicolumn{3}{c}{OD-flow AP} \\
+Scenario & $\gamma$ & L & G & O & L & G & O \\
+\midrule
+Original independent & 0 & 0.1261 & 0.0335 & 0.5539 & 0.9118 & 0.7905 & 0.9440 \\
+Original independent & 1 & 0.1391 & 0.0617 & 0.4163 & 0.8680 & 0.7181 & 0.9295 \\
+Matched dispersed & 0 & 0.2160 & 0.1303 & 0.3971 & 0.2545 & 0.3127 & 0.4541 \\
+Matched dispersed & 1 & 0.1765 & 0.1280 & 0.2842 & 0.2405 & 0.2839 & 0.4460 \\
+Destination grouped & 0 & 0.2956 & 0.1473 & 0.8122 & 0.6652 & 0.9330 & 1.0000 \\
+Destination grouped & 1 & 0.2347 & 0.1565 & 0.4949 & 0.4543 & 0.8096 & 0.9998 \\
+\bottomrule
+\end{tabular}
+\label{tab:exp3_synthetic}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/experiment_03_synthetic_comparison.png}
+\caption{VAE+Lasso (blue), VAE+Group Lasso (orange), and OnlineDA (green) at
+all five synthetic nonlinearity settings. Rows distinguish flow AP,
+flow F1, and destination-group F1; columns distinguish attack structures.
+F1 uses normal-calibrated thresholds. Faint seed trajectories use the same
+marker identities as Figure~\ref{fig:exp3_real}; diamonds and bars show mean
+$\pm$ one sample standard deviation.}
+\label{fig:exp3_synthetic}
+\end{figure}
+
+On the exact original attacks, Group Lasso has lower flow AP and F1 at every
+$\gamma$: grouping is not automatically helpful. On destination-grouped
+attacks, however, it improves flow ranking at every $\gamma$. At $\gamma=1$,
+AP rises from 0.4543 to 0.8096 and relative OD attack-recovery error falls from
+1.1425 to 0.7311. These are genuine ranking and amplitude-recovery gains for
+this structured scenario, but they do not translate into higher calibrated
+flow F1. The grouped penalty can leave many small nonzero coefficients inside
+selected groups, and normal-only thresholds do not necessarily suppress those
+false alarms. At the same endpoint, group F1 changes only from 0.1359 to 0.1417.
+
+OnlineDA has higher mean flow F1 and AP than either VAE decoder in all 15
+scenario--$\gamma$ settings. On destination-grouped attacks at $\gamma=1$,
+its flow F1 is 0.4949, AP is 0.9998, and relative OD recovery error is 0.1894.
+Thus the grouped VAE improves on VAE+Lasso in ranking and recovery, but does
+not outperform the paper-based online baseline in this experiment.
+
+As a secondary, non-tuned operating point, we also retain the fixed absolute
+flow threshold 0.1 already specified in Experiment 2 and the reference protocol.
+For destination-grouped attacks at $\gamma=1$, flow F1 is 0.3768 for Lasso and
+0.3664 for Group Lasso, versus 0.8268 for OnlineDA. The VAE ranking gain is
+not an F1 gain at either reported operating point.
+
+\subsubsection{Numerical verification and scope of the result}
+
+The grouped routing solver uses accelerated proximal gradient with adaptive
+restart and an explicit group-KKT residual, not loss stagnation. All 180,000
+test and 30,000 distinct normal-calibration subproblems satisfy the normalized
+$10^{-5}$ tolerance. Twenty of the 180,000 corresponding test Lasso solves
+miss the strict convergence flag, with worst normalized KKT residual
+$4.84\times10^{-5}$; these cases remain disclosed in the saved audit.
+OnlineDA adds 180,000 test and 30,000 normal-calibration solves; 17 and 8,
+respectively, miss the same strict Lasso flag (worst residual below
+$4.89\times10^{-5}$). None are dropped. All 15 original test streams and 15
+normal-calibration streams reproduce the saved Experiment-2 estimates.
+Eighteen unit tests cover block shrinkage, singleton equivalence to Lasso,
+a primal-dual gap check, label-independent groups, matched attack budgets,
+OnlineDA state restoration, and independent continuous test streams.
+
+Experiment 3 therefore implements an explicit group penalty but finds no
+universal improvement: recorded-flow score denoising gives essentially no gain;
+routed group structure improves ranking and recovery relative to VAE+Lasso,
+but not the tested F1 operating points or the OnlineDA benchmark. Group choice, unequal sizes,
+calibration, and the underdetermined routing map remain important limitations.
+The real arm uses one laboratory capture, and three seeds do not establish
+generalization to independent networks or attacks. Full per-seed results,
+sensitivity settings, hashes, and solver diagnostics are retained with the code.
+
 \subsection{Overall Experimental Conclusions}
 
-Together, the experiments show that nonlinear representation capacity is only one
-part of a security detector.  Experiment 1 detects many DDoS flows but produces
-many false positives under benign cross-day distribution shift.  Experiment 2
-shows that a VAE can learn nonlinear nominal traffic and preserve attack timing,
-yet still localize OD-flow anomalies worse than the paper's linear sparse method.
-Calibration, routing, missing observations, and the structure of the residual are
-therefore as important as the nominal model.
+The three studies separate normal representation, sparse structure, and the
+detection operating point. Experiment 1 detects many DDoS flows but suffers
+from cross-day false positives. Experiment 2 does not show VAE+Lasso outperforming
+the paper's online linear model. Experiment 3 adds a real group penalty: its
+benefit relative to VAE+Lasso depends on attack structure and metric, while
+OnlineDA remains stronger in synthetic flow F1 and AP. A nonlinear
+representation alone does not establish a detection advantage.
 
-The current results do not justify claiming that VAE+Lasso is superior to Dynamic
-Anomalography.  They identify a concrete bottleneck instead: the VAE residual is
-too dense for the underdetermined routing inverse problem.  A next model should
-be conditioned on routing and observation masks and should be evaluated on
-localization, not only event timing.
+The current results support neither universal superiority of VAE+Group Lasso
+nor the conclusion that group sparsity is useless. Structured synthetic attacks
+show improved ranking and amplitude recovery relative to VAE+Lasso, while thresholded
+localization remains weak. A future routing- and mask-conditioned model needs
+independent calibration and evaluation on both individual flows and meaningful
+groups; group penalties alone do not resolve missing information.
 
-Group sparsity is a promising but separate continuation.  It should be introduced
-only after defining meaningful and auditable groups and constructing matched
-group-structured attacks.  The resulting comparison should include the paper's
-elementwise Lasso as the control, Group Lasso as the structured decoder, and
-VAE-based nominal models with and without the same structured penalty.  This
-design would isolate the contribution of nonlinearity from the contribution of
-group structure.
-
+\clearpage
 % We now use the 'alpha' style for formal, letter-based citations (e.g., [BDE09])
 \bibliographystyle{alpha}
 \bibliography{references}

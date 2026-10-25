@@ -1,6 +1,6 @@
 # Experiment 01: normal-only VAE for CIC-IDS2017
 
-This experiment establishes the plain VAE baseline for network-flow anomaly detection. Each row is one observed flow and each retained column is a numeric traffic statistic. The experiment uses real, unchanged flow measurements. It does not yet implement RPCA, group sparsity, or synthetic attacks.
+Experiment 1 establishes the plain VAE baseline for network-flow anomaly detection. Each row is one observed flow and each retained column is a numeric traffic statistic. This baseline uses real, unchanged flow measurements without a sparse optimization stage. The separate [third experiment](EXPERIMENT_03.md) now compares ordinary and group-sparse decoding on recorded and synthetic data.
 
 ## Current project layout
 
@@ -122,7 +122,11 @@ Average precision (AP) and trapezoidal PR-AUC are saved under separate names bec
 
 This baseline measures flow-level detection on a specific cross-day dataset. Monday-to-Friday distribution shift can cause false positives unrelated to attack structure. Strong performance alone would not establish a contribution from group sparsity or superiority to RPCA. Real data does not provide ground-truth additive `L` and `S`, so decomposition recovery errors cannot be reported.
 
-The next controlled comparison can introduce RPCA, group-RPCA, and a carefully specified group-sparse VAE. The alternating shrinkage sketch in the background notes is not assumed to solve the full nonlinear VAE objective exactly. Those methods need a separate derivation and matched evaluation protocol.
+Experiment 3 implements a controlled comparison between a frozen VAE followed by
+Lasso or Group Lasso. It does not claim to solve a joint nonlinear VAE/sparse
+objective exactly or train an end-to-end differentiable optimization layer.
+The synthetic arm additionally benchmarks both against the original OnlineDA
+implementation on the same observations.
 
 The configured CSV files are present locally. Full CSVs are loaded into RAM, so memory grows with dataset size.
 
@@ -158,3 +162,44 @@ are configured separately:
 
 See `EXPERIMENT_02.md` for the protocol, configuration, comparison limits, and outputs.
 The previous 50-channel generator remains available in `experiment_02_legacy.json`.
+
+## Experiment 03: ordinary versus grouped sparse decoding
+
+The [third experiment](EXPERIMENT_03.md) reuses the frozen VAE models and exact
+data from both earlier experiments. On CICIDS2017, destination/time groups are
+used for identity-design anomaly-score denoising; no routing matrix is invented
+for these flow CSVs. On the synthetic network, destination groups are used in
+a routing-aware Group-Lasso decoder, compared with the original Lasso decoder
+over all five gamma settings and three seeds. Matched dispersed and grouped
+attack controls are included alongside the original independent attacks.
+OnlineDA is a third synthetic baseline, with unchanged Experiment-2 parameters
+and an independent copy of its normal-trained state for each test stream.
+
+```bash
+.venv/bin/python -m traffic_vae.experiment_03 --config experiment_03.json
+.venv/bin/python -m traffic_vae.experiment_03_online
+.venv/bin/python -m traffic_vae.group_figures --online-source runs/experiment_03_onlineda
+```
+
+Raw runs remain local under `runs/experiment_03_full/`. The portable
+`output/experiment_03/results.json` retains all seed-level results and audits.
+The additional OnlineDA arrays, replay checks, and diagnostics remain under
+`runs/experiment_03_onlineda/`; the original VAE results are not overwritten.
+The survey includes the primary results, two new figures, numerical checks,
+and the limitations of the real-data and synthetic arms.
+
+## Exploratory high-rank nonlinear sensitivity
+
+The separate [high-rank sensitivity protocol](HIGH_RANK_SENSITIVITY.md) tests a
+two-latent-dimensional, 16-feature Fourier manifold with a broad linear spectrum.
+It retrains the synthetic VAEs and repeats routed Lasso / Group-Lasso / OnlineDA
+comparisons, with a fixed OnlineDA rank-16 capacity control. This is an artificial
+stress test, not a replacement selected for favorable VAE test performance.
+The original experiments, main figures, and survey are preserved.
+Completed outcomes, both favorable and unfavorable operating points, and
+separate figures are in the [result summary](output/high_rank_sensitivity/README.md).
+
+```bash
+.venv/bin/python -m traffic_vae.high_rank_sensitivity
+.venv/bin/python -m traffic_vae.high_rank_results
+```
