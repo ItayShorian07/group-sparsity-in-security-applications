@@ -24599,5 +24599,5 @@
     "runs/high_rank_sensitivity/onlineda/synthetic_metrics.csv": "ac780ff834684cb576ef4ab7e63ea665e1c54f509a6382c7ad6cbd3266d3ef2f",
     "runs/high_rank_sensitivity/rank_control/synthetic_metrics.csv": "cd36e037776b7ed72f5535620e76d0d862b546d9e6ce2f809e6ebe476003a48c"
   },
-  "interpretation": "Exploratory artificial stress test; report all settings, no significance claim, original survey unchanged"
+  "interpretation": "Exploratory artificial stress test; report all settings, no significance claim, main project-report results unchanged"
 }

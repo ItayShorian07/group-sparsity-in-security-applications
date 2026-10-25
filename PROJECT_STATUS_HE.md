@@ -135,7 +135,8 @@ AP של 0.9998 ושגיאת שחזור 0.1894. היתרון של Group הוא ב
 - `experiment_02_tracking.json` — ארבעת תרחישי Figure 4.
 - `runs/experiment_02_paper/` — תוצאות הסריקה הראשית.
 - `runs/experiment_02_tracking/` — תוצאות תרחישי tracking.
-- `output/pdf/survey_with_experiments.pdf` — המאמר המעודכן עם הטבלאות והגרפים.
+- `output/pdf/group_sparsity_project_report.pdf` — דוח הפרויקט המעודכן עם הטבלאות והגרפים.
+- `group_sparsity_project_report.tex` — מקור ה-LaTeX של דוח הפרויקט.
 
 ## בדיקת רגישות נפרדת: דאטה לא-לינארי מדרגה לינארית גבוהה
 

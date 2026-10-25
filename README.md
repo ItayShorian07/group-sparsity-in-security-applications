@@ -1,4 +1,24 @@
-# Experiment 01: normal-only VAE for CIC-IDS2017
+# Group Sparsity in Security Applications
+
+Project report and implementation for the study of VAE-based anomaly detection
+and ordinary versus group-sparse attack localization.
+
+- [Project report (PDF)](output/pdf/group_sparsity_project_report.pdf)
+- [Report source (LaTeX)](group_sparsity_project_report.tex)
+- [Experiment 2 protocol](EXPERIMENT_02.md)
+- [Experiment 3 protocol and results](EXPERIMENT_03.md)
+
+To rebuild the report with a LaTeX installation, run from the repository root:
+
+```bash
+latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=output/pdf group_sparsity_project_report.tex
+```
+
+The report contains the literature review and the three main experiments.
+The exploratory high-rank sensitivity results remain separate and are not
+included in the report.
+
+## Experiment 01: normal-only VAE for CIC-IDS2017
 
 Experiment 1 establishes the plain VAE baseline for network-flow anomaly detection. Each row is one observed flow and each retained column is a numeric traffic statistic. This baseline uses real, unchanged flow measurements without a sparse optimization stage. The separate [third experiment](EXPERIMENT_03.md) now compares ordinary and group-sparse decoding on recorded and synthetic data.
 
@@ -10,6 +30,8 @@ Experiment 1 establishes the plain VAE baseline for network-flow anomaly detecti
 ├── README.md
 ├── pyproject.toml           # Package definition and dependencies
 ├── requirements-lock.txt    # Verified dependency versions
+├── group_sparsity_project_report.tex  # Project report source
+├── output/pdf/group_sparsity_project_report.pdf  # Compiled project report
 ├── data/
 │   └── TrafficLabelling/    # Eight extracted CIC-IDS2017 CSV files
 ├── src/
@@ -185,7 +207,7 @@ Raw runs remain local under `runs/experiment_03_full/`. The portable
 `output/experiment_03/results.json` retains all seed-level results and audits.
 The additional OnlineDA arrays, replay checks, and diagnostics remain under
 `runs/experiment_03_onlineda/`; the original VAE results are not overwritten.
-The survey includes the primary results, two new figures, numerical checks,
+The project report includes the primary results, two new figures, numerical checks,
 and the limitations of the real-data and synthetic arms.
 
 ## Exploratory high-rank nonlinear sensitivity
@@ -195,7 +217,7 @@ two-latent-dimensional, 16-feature Fourier manifold with a broad linear spectrum
 It retrains the synthetic VAEs and repeats routed Lasso / Group-Lasso / OnlineDA
 comparisons, with a fixed OnlineDA rank-16 capacity control. This is an artificial
 stress test, not a replacement selected for favorable VAE test performance.
-The original experiments, main figures, and survey are preserved.
+The original experiments, main figures, and project-report results are preserved.
 Completed outcomes, both favorable and unfavorable operating points, and
 separate figures are in the [result summary](output/high_rank_sensitivity/README.md).
 

@@ -135,7 +135,7 @@ def export(source, output):
         'online_source_hashes': json.loads((source / 'onlineda/source_hashes.json').read_text()),
         'rank_control_source_hashes': json.loads((source / 'rank_control/source_hashes.json').read_text()),
         'metric_files_sha256': {str(path): sha256(path) for path in source_files},
-        'interpretation': 'Exploratory artificial stress test; report all settings, no significance claim, original survey unchanged',
+        'interpretation': 'Exploratory artificial stress test; report all settings, no significance claim, main project-report results unchanged',
     }
     output.mkdir(parents=True, exist_ok=True)
     write_json(output / 'results.json', payload)

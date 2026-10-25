@@ -49,7 +49,7 @@ The separate `runs/experiment_03_onlineda/` directory retains the third method's
 arrays and histories; the old two-decoder run is unchanged. The combined JSON
 contains 135 synthetic seed-level records and the unchanged recorded-data results.
 
-## Survey editing scope
+## Project report editing scope
 
 Experiment 3 receives its own methods, real-data and synthetic results tables,
 two figures, and limitations. To make room, Experiment 1 retains its main
@@ -57,5 +57,5 @@ metric table and score/PR figure; the duplicate metric/confusion plot and the
 additional shift/threshold figures are omitted from the main PDF, with their
 key numerical findings retained in prose. Experiment 2 retains both main sweep
 figures and the tracking table, but omits the tracking plot that repeats it.
-Original figure files and raw results remain available. The theoretical survey
+Original figure files and raw results remain available. The literature-review section
 and the earlier requested convergence corrections were preserved.

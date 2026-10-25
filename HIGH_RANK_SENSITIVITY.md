@@ -8,7 +8,7 @@ The generator and settings in `high_rank_sensitivity.json` are fixed before
 evaluating its new test metrics. This is an exploratory stress test prompted by
 the earlier results, not an independently preregistered confirmatory experiment.
 No generator search or selection for favorable VAE test scores is performed.
-Original Experiments 1--3, their datasets, and the survey PDF are preserved.
+Original Experiments 1--3, their datasets, and the main project-report results are preserved.
 A new result is not substituted for the original merely because it is favorable.
 
 ## Generator
@@ -112,7 +112,7 @@ stopping or test-label tuning.
 The second command exports every completed comparison, the unchanged original
 linear-control regression check, paired seed differences, solver diagnostics,
 and two scientific figures under `output/high_rank_sensitivity/`. It does not
-replace `output/experiment_03/results.json`, the main figures, or the survey.
+replace `output/experiment_03/results.json`, the main figures, or the project report.
 
 ## Completed outcome
 
@@ -125,4 +125,4 @@ at gamma=1. That advantage is absent against rank 16 and does not imply a
 better AP or calibrated F1. The full positive and negative outcomes, including
 numerical exceptions and limitations, are in the
 [result summary](output/high_rank_sensitivity/README.md). Original results and
-the survey have not been replaced.
+the main project-report results have not been replaced.

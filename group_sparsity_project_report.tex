@@ -16,17 +16,22 @@
 \captionsetup{margin=0pt,indention=0pt}
 % Keep prose flush with the text margin, including special environments.
 \patchcmd{\abstract}{\quotation}{}{}
-  {\PackageError{survey}{Abstract alignment patch failed}{}}
+  {\PackageError{project-report}{Abstract alignment patch failed}{}}
 \patchcmd{\endabstract}{\endquotation}{}{}
-  {\PackageError{survey}{Abstract alignment patch failed}{}}
+  {\PackageError{project-report}{Abstract alignment patch failed}{}}
 \patchcmd{\thebibliography}{\leftmargin\labelwidth}
   {\leftmargin0pt\labelwidth0pt\itemindent\labelsep
    \let\makelabel\textnormal}{}
-  {\PackageError{survey}{Bibliography alignment patch failed}{}}
+  {\PackageError{project-report}{Bibliography alignment patch failed}{}}
 \patchcmd{\thebibliography}{\advance\leftmargin\labelsep}
   {}{}
-  {\PackageError{survey}{Bibliography alignment patch failed}{}}
-\hypersetup{hypertexnames=false}
+  {\PackageError{project-report}{Bibliography alignment patch failed}{}}
+\hypersetup{
+  hypertexnames=false,
+  pdftitle={Group Sparsity in Security Applications - Project Report},
+  pdfauthor={Itay Shorian},
+  pdfsubject={Project Report}
+}
 
 % This block creates the .bib file automatically with the references
 \begin{filecontents}{references.bib}
@@ -138,14 +143,14 @@
   howpublished={\url{https://www.unb.ca/cic/datasets/ids-2017.html}}
 }
 \end{filecontents}
-\title{\textbf{Survey on Group Sparsity in Security Applications}}
+\title{\textbf{Group Sparsity in Security Applications}\\[0.4em]\large Project Report}
 \author{Itay Shorian \\ Advisor: Dr.\ Nadav Hallak}
 \date{11 December 2025}
 \begin{document}
 \maketitle
 \begin{abstract}
 \noindent
-This survey reviews the application of Group Sparsity in security-oriented systems. We classify applications into four domains: Cyber-Physical Systems, Network Traffic Analysis, Smart Grids, and Biometric Security. For each domain, we present the mathematical formulation, the optimization model, and the algorithmic solution utilized to detect and mitigate threats. Additionally, we discuss emerging applications in detecting algorithmically generated malicious domains.
+This project report reviews the application of Group Sparsity in security-oriented systems. We classify applications into four domains: Cyber-Physical Systems, Network Traffic Analysis, Smart Grids, and Biometric Security. For each domain, we present the mathematical formulation, the optimization model, and the algorithmic solution utilized to detect and mitigate threats. Additionally, we discuss emerging applications in detecting algorithmically generated malicious domains.
 \end{abstract}
 
 \section{Introduction}
@@ -273,7 +278,7 @@ Here, the $\ell_1$ regularization term enforces sparsity, selecting only the mos
 
 \section{Discussion}
 
-The applications reviewed in this survey demonstrate that Group Sparsity provides a unifying mathematical framework for addressing security challenges in cyber-physical and networked systems. Whether in identifying compromised manufacturing stages, detecting coordinated false data injection in smart grids, or isolating occlusions in biometric recognition, these methods exploit low-dimensional structures to enable scalable detection, localization, and interpretation of adversarial behavior.
+The applications reviewed in this report demonstrate that Group Sparsity provides a unifying mathematical framework for addressing security challenges in cyber-physical and networked systems. Whether in identifying compromised manufacturing stages, detecting coordinated false data injection in smart grids, or isolating occlusions in biometric recognition, these methods exploit low-dimensional structures to enable scalable detection, localization, and interpretation of adversarial behavior.
 
 \paragraph{Research Gaps.}
 Although structured sparsity has demonstrated substantial potential in security-oriented applications, several gaps remain open in the literature:

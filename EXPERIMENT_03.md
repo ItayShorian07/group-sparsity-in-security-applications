@@ -206,5 +206,5 @@ all possible group-sparse models.
 - [Yuan and Lin: Group Lasso](https://www.columbia.edu/~my2550/papers/glasso.final.pdf).
 - [Mardani et al.: Dynamic Anomalography](https://arxiv.org/abs/1208.4043).
 
-The survey contains the concise results and interpretation; the JSON export
+The project report contains the concise results and interpretation; the JSON export
 preserves every seed, sensitivity setting, threshold, and solver audit.

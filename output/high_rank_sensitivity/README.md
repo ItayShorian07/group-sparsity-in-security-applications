@@ -1,7 +1,7 @@
 # High-rank nonlinear stress-test results
 
 This is a completed **exploratory sensitivity test**, not a replacement for
-Experiments 1--3 or the survey. The single declared generator uses two latent
+Experiments 1--3 or the project report. The single declared generator uses two latent
 coordinates but 16 equal-power nonlinear Fourier features. At gamma=1 all
 three seeds need 16 linear components for 95% of clean nominal energy; the
 best five normal-training components explain only 32.6--33.4%.
@@ -64,7 +64,7 @@ metric or generator result.
 - All 22 unit tests pass. The gamma=0 metrics match the original experiment;
   original routing, noise, attacks, and linear observations match array-for-array.
 - Every original VAE checkpoint and truth-array hash matches the pre-existing
-  Experiment-3 export. The existing main results and survey are unchanged.
+  Experiment-3 export. The existing main results are unchanged.
 - All 180,000 Group-Lasso test and 30,000 distinct group-calibration solves meet
   their tolerance. Of 180,000 test solves per other method, strict Lasso flags
   fail for 23 VAE+Lasso, 1 OnlineDA rank-5, and 31 rank-16 cases. Ten rank-16
