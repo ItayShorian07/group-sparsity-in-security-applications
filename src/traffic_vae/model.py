@@ -6,6 +6,8 @@ from torch.utils.data import DataLoader, TensorDataset
 
 
 class VAE(nn.Module):
+    """Encode each observation as a latent Gaussian and decode it back."""
+
     def __init__(self, input_dim: int, hidden_dims: list[int], latent_dim: int):
         super().__init__()
         layers = []
@@ -25,6 +27,7 @@ class VAE(nn.Module):
         self.decoder = nn.Sequential(*layers)
 
     def forward(self, x, sample: bool = True):
+        """Sample latent codes for training; use the mean for deterministic scoring."""
         hidden = self.encoder(x)
         mu = self.mu(hidden)
         logvar = self.logvar(hidden).clamp(-20.0, 20.0)
@@ -33,6 +36,7 @@ class VAE(nn.Module):
 
 
 def loss_terms(reconstruction, x, mu, logvar, beta):
+    """Return total loss, reconstruction loss, and the unweighted KL term."""
     reconstruction_loss = (reconstruction - x).square().sum(dim=1).mean()
     kl = -0.5 * (1 + logvar - mu.square() - logvar.exp()).sum(dim=1).mean()
     return reconstruction_loss + beta * kl, reconstruction_loss, kl
@@ -40,6 +44,7 @@ def loss_terms(reconstruction, x, mu, logvar, beta):
 
 @torch.no_grad()
 def score(model: VAE, values: np.ndarray, batch_size: int) -> np.ndarray:
+    """Return one deterministic L2 reconstruction-error score per observation."""
     model.eval()
     scores = []
     for start in range(0, len(values), batch_size):
@@ -53,6 +58,7 @@ def score(model: VAE, values: np.ndarray, batch_size: int) -> np.ndarray:
 
 
 def train(model: VAE, training: np.ndarray, validation: np.ndarray, config: dict, logger):
+    """Train on normal data and restore the lowest-validation-error checkpoint."""
     loader = DataLoader(TensorDataset(torch.from_numpy(training)),
                         batch_size=config["batch_size"], shuffle=True,
                         generator=torch.Generator().manual_seed(config["seed"]))
@@ -78,6 +84,7 @@ def train(model: VAE, training: np.ndarray, validation: np.ndarray, config: dict
                         "kl": totals[2], "validation_squared_l2": validation_mse})
         logger.info("Epoch %03d | loss %.6f | reconstruction %.6f | KL %.6f | validation %.6f",
                     epoch, *totals, validation_mse)
+        # Any strictly lower validation error resets patience; no min_delta is used.
         if validation_mse < best:
             best, stale = validation_mse, 0
             best_state = {name: value.detach().clone() for name, value in model.state_dict().items()}

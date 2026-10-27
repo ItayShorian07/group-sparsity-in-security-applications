@@ -23,6 +23,7 @@ def sha256(path: Path) -> str:
 
 
 def read_flows(path: Path) -> tuple[pd.DataFrame, pd.Series]:
+    """Load numeric flow features and normalized labels, excluding identifiers."""
     frame = pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
     frame.columns = frame.columns.str.strip()
     if frame.columns.duplicated().any():
@@ -52,6 +53,7 @@ class Preprocessor:
 
     @classmethod
     def fit(cls, frame: pd.DataFrame) -> "Preprocessor":
+        """Fit normal-training statistics and discard unusable features."""
         usable = frame.loc[:, frame.notna().any(axis=0)]
         median = usable.median().to_numpy(dtype=np.float64)
         values = usable.fillna(dict(zip(usable.columns, median))).to_numpy(dtype=np.float64)
@@ -64,6 +66,7 @@ class Preprocessor:
                    values.mean(axis=0)[keep], scale[keep])
 
     def transform(self, frame: pd.DataFrame) -> np.ndarray:
+        """Reuse fitted statistics without learning from held-out rows."""
         values = frame[self.columns].to_numpy(dtype=np.float64, copy=True)
         values = np.where(np.isfinite(values), values, self.median)
         values = np.sign(values) * np.log1p(np.abs(values))
@@ -85,6 +88,7 @@ class Preprocessor:
 
 def prepare(normal_path: Path, test_path: Path, train_fraction: float,
             validation_fraction: float):
+    """Split normal rows, exclude exact test overlaps, and retain row provenance."""
     if not (0 < train_fraction < 1 and 0 < validation_fraction < 1
             and np.isclose(train_fraction + validation_fraction, 1.0, rtol=0, atol=1e-9)):
         raise ValueError("Train and validation fractions must be positive and sum to one.")

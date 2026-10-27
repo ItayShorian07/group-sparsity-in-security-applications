@@ -18,6 +18,18 @@ The report contains the literature review and the three main experiments.
 The exploratory high-rank sensitivity results remain separate and are not
 included in the report.
 
+## Code guide
+
+- `data.py`: flow loading, split auditing, and training-only preprocessing.
+- `model.py` and `evaluation.py`: VAE training, anomaly scores, and calibration.
+- `paper_synthetic.py` and `paper_experiment.py`: the routed synthetic comparison.
+- `anomalography.py` and `group_sparse.py`: OnlineDA, Lasso, and Group Lasso.
+- `experiment_03.py`: matched ordinary/group-sparse decoding on frozen VAE outputs.
+
+The final report is kept only under `output/pdf/`; root-level copies, LaTeX
+build files, and Python/test caches are disposable. Recorded datasets, trained
+models, completed runs, and legacy controls are retained for reproducibility.
+
 ## File naming
 
 Human-facing documents, configurations, figures, and published result directories

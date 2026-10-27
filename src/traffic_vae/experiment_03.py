@@ -26,6 +26,7 @@ from .paper_experiment import reconstruct
 
 
 def metadata_groups(frame, row_indices, window_seconds):
+    """Group flows by destination and time window, without using attack labels."""
     selected = frame.iloc[np.asarray(row_indices, dtype=int)]
     stamps = pd.to_datetime(selected['Timestamp'], format='mixed', dayfirst=True, errors='raise')
     if stamps.isna().any() or selected['Destination IP'].isna().any():
@@ -36,6 +37,7 @@ def metadata_groups(frame, row_indices, window_seconds):
 
 
 def group_scores(scores, ids):
+    """Compute one root-mean-square anomaly score per group."""
     sizes = np.bincount(ids)
     return np.sqrt(np.bincount(ids, weights=np.asarray(scores)**2) / sizes)
 
@@ -52,6 +54,7 @@ def real_metrics(scores, calibration, labels, ids, calibration_ids, target_fpr):
 
 
 def real_arm(config, output, logger):
+    """Compare score shrinkage using the frozen Experiment-1 predictions."""
     source = Path(config['real_source'])
     manifest = pd.read_csv(source / 'split_manifest.csv')
     metadata = {}
@@ -157,6 +160,7 @@ def matched_attacks(flows, size, attacked_times, seed):
 
 
 def synthetic_metrics(estimate, calibration, truth, groups, target_fpr, routing):
+    """Measure flow/group/time detection and attack-amplitude recovery."""
     result = {}
     scores = {
         'flow': (np.abs(estimate).ravel(), np.abs(calibration).ravel(), (truth != 0).ravel()),
@@ -177,6 +181,7 @@ def synthetic_metrics(estimate, calibration, truth, groups, target_fpr, routing)
 
 
 def decode_group(residuals, routing, groups, config, logger, name):
+    """Recover grouped OD-flow anomalies from VAE link residuals."""
     estimates, history = [], []
     for start in range(0, len(residuals), 512):
         estimated, diagnostics = solve_group_lasso_batch(
@@ -190,6 +195,7 @@ def decode_group(residuals, routing, groups, config, logger, name):
 
 
 def decode_lasso(residuals, routing, config, logger, name):
+    """Recover sparse OD-flow anomalies from each VAE link residual vector."""
     estimates, history = [], []
     for index, residual in enumerate(residuals):
         estimate, diagnostics = solve_lasso(routing, residual, config['synthetic_penalty'], 10000, 1e-7)
@@ -206,6 +212,7 @@ def solver_summary(history):
 
 
 def synthetic_arm(config, output, logger):
+    """Compare decoders on identical routed data and frozen VAE checkpoints."""
     source = Path(config['synthetic_source'])
     source_config = json.loads((source / 'config.json').read_text())
     directory = output / 'synthetic'

@@ -94,6 +94,7 @@ def validate_gammas(gammas):
 
 @torch.no_grad()
 def reconstruct(model, values, batch_size):
+    """Reconstruct normal link traffic at the VAE posterior mean."""
     model.eval()
     result = np.concatenate([
         model(torch.from_numpy(values[start:start + batch_size]), sample=False)[0].numpy()
@@ -184,6 +185,7 @@ def summarize(table, output):
 
 
 def run_case(config, base, seed, gamma, directory, logger):
+    """Run a matched VAE/OnlineDA comparison for one seed and gamma value."""
     directory.mkdir()
     flows, clean, observed = base.observed(gamma)
     routing = base.network['R']

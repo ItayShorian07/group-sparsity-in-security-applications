@@ -31,6 +31,7 @@ def summary(frame):
 
 
 def export(source, output):
+    """Export every setting and diagnostic, not only favorable outcomes."""
     source, output = Path(source), Path(output)
     completed = json.loads((source / 'completed.json').read_text())
     settings = json.loads((source / 'settings.json').read_text())

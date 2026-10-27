@@ -131,6 +131,7 @@ class PaperSyntheticBase:
 
 
 def generate(config, seed):
+    """Create paired traffic splits, routing, noise, and attacks for a fixed seed."""
     # Topology rejection cannot change the latent/noise/attack random streams.
     streams = [np.random.default_rng(child) for child in np.random.SeedSequence(seed).spawn(7)]
     topology_rng, map_rng, latent_rng, noise_rng, attack_rng, routing_rng, mask_rng = streams

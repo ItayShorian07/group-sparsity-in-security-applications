@@ -7,6 +7,7 @@ import numpy as np
 
 
 def partition(groups, width):
+    """Validate disjoint groups and return packed indices, sizes, and offsets."""
     arrays = [np.asarray(group, dtype=int) for group in groups]
     if not arrays or any(group.ndim != 1 or not len(group) for group in arrays):
         raise ValueError('Groups must be nonempty one-dimensional index arrays.')

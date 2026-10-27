@@ -56,6 +56,8 @@ class OnlineResult:
 
 
 class OnlineAnomalography:
+    """Track low-rank nominal link traffic and sparse OD-flow anomalies."""
+
     def __init__(self, rank: int, ridge: float, sparse_penalty: float,
                  max_iterations: int = 3000, tolerance: float = 1e-7, *,
                  routing: np.ndarray | None = None, forgetting_factor: float = 1.,
@@ -82,6 +84,7 @@ class OnlineAnomalography:
         self.cross = None
 
     def initialize(self, normal_prefix: np.ndarray):
+        """Warm-start the basis and sufficient statistics from normal observations."""
         values = np.asarray(normal_prefix, dtype=np.float64)
         if (values.ndim != 2 or min(values.shape) < self.rank
                 or not np.isfinite(values).all()):
@@ -103,6 +106,7 @@ class OnlineAnomalography:
         ])
 
     def copy(self):
+        """Clone adaptive state so calibration and test streams stay independent."""
         clone = OnlineAnomalography(self.rank, self.ridge, self.sparse_penalty,
                                     self.max_iterations, self.tolerance, routing=self.routing,
                                     forgetting_factor=self.forgetting_factor,

@@ -21,6 +21,7 @@ MARKERS = {17: 'o', 42: 's', 2026: '^'}
 
 
 def export(source, online_source=None):
+    """Export matched seed-level results and figures from completed runs."""
     source = Path(source)
     config = json.loads((source / 'config.json').read_text())
     real, synthetic = pd.read_csv(source / 'real_metrics.csv'), pd.read_csv(source / 'synthetic_metrics.csv')

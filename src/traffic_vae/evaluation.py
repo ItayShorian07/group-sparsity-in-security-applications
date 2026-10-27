@@ -7,12 +7,14 @@ from sklearn.metrics import (
 
 
 def calibrate(scores: np.ndarray, target_fpr: float) -> float:
+    """Choose a normal-score quantile without consulting test labels."""
     if not 0 < target_fpr < 1 or len(scores) < 2 or not np.isfinite(scores).all():
         raise ValueError("Calibration requires finite scores and 0 < target_fpr < 1.")
     return float(np.quantile(scores, 1 - target_fpr, method="higher"))
 
 
 def evaluate(labels: np.ndarray, scores: np.ndarray, threshold: float) -> dict:
+    """Compute thresholded detection and threshold-independent ranking metrics."""
     if set(np.unique(labels)) != {0, 1}:
         raise ValueError("Evaluation requires both normal and attack examples.")
     if len(labels) != len(scores) or not np.isfinite(scores).all():

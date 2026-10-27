@@ -72,6 +72,7 @@ def load_config(path: Path) -> dict:
 
 
 def run(config: dict) -> Path:
+    """Train each seed, calibrate on normal validation, and save audited results."""
     output = Path(config["output_dir"])
     output.mkdir(parents=True, exist_ok=False)
     logger = logging.getLogger(f"traffic_vae.{output}")
