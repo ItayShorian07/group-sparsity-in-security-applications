@@ -26,7 +26,7 @@ dist/
 *.out
 *.fdb_latexmk
 *.fls
-/group_sparsity_project_report.pdf
+/group sparsity project report.pdf
 
 # Local credentials, editor settings, and operating system files
 .env

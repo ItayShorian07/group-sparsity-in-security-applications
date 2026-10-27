@@ -1,6 +1,6 @@
 {
-  "paper_config": "experiment_02.json",
-  "group_config": "experiment_03.json",
+  "paper_config": "experiment-02.json",
+  "group_config": "experiment-03.json",
   "original_source": "runs/experiment_02_paper",
   "output_dir": "runs/high_rank_sensitivity",
   "fourier_modes": [[1, 0], [0, 1], [1, 1], [1, -1], [2, 0], [0, 2], [2, 1], [1, 2]],

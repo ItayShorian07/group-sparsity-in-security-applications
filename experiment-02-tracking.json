@@ -1,5 +1,5 @@
 {
-  "base_config": "experiment_02.json",
+  "base_config": "experiment-02.json",
   "output_dir": "runs/experiment_02_tracking",
   "seeds": [17, 42, 2026],
   "test_size": 1000,

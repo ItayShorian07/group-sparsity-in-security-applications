@@ -247,7 +247,7 @@ def run(settings_path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', default='high_rank_sensitivity.json')
+    parser.add_argument('--config', default='high-rank-sensitivity.json')
     args = parser.parse_args()
     run(args.config)
 

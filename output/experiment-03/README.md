@@ -43,7 +43,7 @@ the strict flag, with worst residual below 4.89e-5. The export includes these
 audits and all 15 original-test / 15 normal-calibration replay checks.
 
 The complete method, assumptions, limitations, and reproduction commands are in
-[EXPERIMENT_03.md](../../EXPERIMENT_03.md). Large raw arrays remain in the local
+[EXPERIMENT-03.md](../../EXPERIMENT-03.md). Large raw arrays remain in the local
 `runs/experiment_03_full/` directory and are not committed by default.
 The separate `runs/experiment_03_onlineda/` directory retains the third method's
 arrays and histories; the old two-decoder run is unchanged. The combined JSON

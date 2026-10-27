@@ -347,7 +347,7 @@ The main explanation for this behavior is distribution shift between the Monday 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/experiment_01_scores_and_pr.png}
+\includegraphics[width=0.95\textwidth]{figures/experiment-01-scores-and-pr.png}
 \caption{Normalized reconstruction-score distributions and precision-recall behavior. The threshold calibrated on Monday does not transfer cleanly to benign Friday traffic.}
 \label{fig:exp1_scores}
 \end{figure}
@@ -394,7 +394,7 @@ $\alpha$ & VAE & RPCA & OnlineDA \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/experiment_02_detection_vs_alpha.png}
+\includegraphics[width=0.95\textwidth]{figures/experiment-02-detection-vs-alpha.png}
 \caption{Time-level detection performance as the normal traffic changes from linear to nonlinear.}
 \label{fig:exp2_detection}
 \end{figure}
@@ -405,7 +405,7 @@ As $\alpha$ increases, the behavior changes. Starting from $\alpha=0.5$, the VAE
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/experiment_02_paired_advantage.png}
+\includegraphics[width=0.95\textwidth]{figures/experiment-02-paired-advantage.png}
 \caption{Paired VAE advantage over RPCA and OnlineDA. Values above zero indicate better VAE performance on the same seed and same generated data.}
 \label{fig:exp2_paired}
 \end{figure}
@@ -431,7 +431,7 @@ $\alpha$ & Method & Relative error in $L$ & Relative error in $S$ \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/experiment_02_mechanism_and_recovery.png}
+\includegraphics[width=0.95\textwidth]{figures/experiment-02-mechanism-and-recovery.png}
 \caption{Effective rank and recovery errors. The VAE becomes favorable when the normal signal is nonlinear but remains low-dimensional.}
 \label{fig:exp2_mechanism}
 \end{figure}
@@ -440,7 +440,7 @@ However, the result is more nuanced at the group-localization level. At $\alpha=
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/experiment_02_group_localization.png}
+\includegraphics[width=0.95\textwidth]{figures/experiment-02-group-localization.png}
 \caption{Group-level localization metrics. Strong time-level detection by the VAE does not automatically imply superior group localization.}
 \label{fig:exp2_group}
 \end{figure}
@@ -449,7 +449,7 @@ The attack-map visualization illustrates the same point qualitatively. In the li
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/experiment_02_attack_maps_seed_17.png}
+\includegraphics[width=0.95\textwidth]{figures/experiment-02-attack-maps-seed-17.png}
 \caption{Example residual maps for one seed. The nonlinear case shows the VAE preserving attack timing but with denser residual noise.}
 \label{fig:exp2_maps}
 \end{figure}
@@ -527,7 +527,7 @@ flow false-positive rates are 0.0585 and 0.0131, respectively.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth]{figures/experiment_02_paper_detection.png}
+\includegraphics[width=0.98\textwidth]{figures/experiment-02-paper-detection.png}
 \caption{Detection and OD-flow localization in the paper-routed nonlinear sweep.
 The VAE preserves attack timing but produces a much denser flow residual.}
 \label{fig:exp2_paper_detection}
@@ -543,7 +543,7 @@ is 0.5860 for VAE+Lasso and 0.4276 for OnlineDA.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth]{figures/experiment_02_paper_rank_recovery.png}
+\includegraphics[width=0.98\textwidth]{figures/experiment-02-paper-rank-recovery.png}
 \caption{The effective linear rank grows with $\gamma$, but the configured VAE
 still has higher OD-anomaly recovery error.}
 \label{fig:exp2_paper_rank}
@@ -668,7 +668,7 @@ group-aware traffic model or removal of cross-day distribution shift.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth]{figures/experiment_03_real_comparison.png}
+\includegraphics[width=0.98\textwidth]{figures/experiment-03-real-comparison.png}
 \caption{Recorded-flow comparison. Circles, squares, and triangles identify
 seeds 17, 42, and 2026; diamonds and error bars show the mean and one sample
 standard deviation. These are model seeds on one capture, not independent
@@ -746,7 +746,7 @@ Destination grouped & 1 & 0.2347 & 0.1565 & 0.4949 & 0.4543 & 0.8096 & 0.9998 \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth]{figures/experiment_03_synthetic_comparison.png}
+\includegraphics[width=0.98\textwidth]{figures/experiment-03-synthetic-comparison.png}
 \caption{VAE+Lasso (blue), VAE+Group Lasso (orange), and OnlineDA (green) at
 all five synthetic nonlinearity settings. Rows distinguish flow AP,
 flow F1, and destination-group F1; columns distinguish attack structures.

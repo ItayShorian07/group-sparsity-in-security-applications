@@ -41,7 +41,7 @@ def main_sweep(summary, ranks, output):
     handles, labels = axes[0, 0].get_legend_handles_labels()
     figure.legend(handles, labels, loc="upper center", bbox_to_anchor=(.5, 1.035),
                   ncol=2, frameon=False)
-    _save(figure, output / "experiment_02_paper_detection.png")
+    _save(figure, output / "experiment-02-paper-detection.png")
 
     rank_summary = ranks.groupby("gamma")[["rank_95", "rank_99"]].agg(["mean", "std"])
     figure, axes = plt.subplots(1, 2, figsize=(10, 3.8), constrained_layout=True)
@@ -64,7 +64,7 @@ def main_sweep(summary, ranks, output):
     axes[1].set_xticks(sorted(summary["gamma"].unique()))
     axes[1].grid(alpha=.25)
     axes[1].legend(frameon=False)
-    _save(figure, output / "experiment_02_paper_rank_recovery.png")
+    _save(figure, output / "experiment-02-paper-rank-recovery.png")
 
 
 def tracking(summary, output):
@@ -99,7 +99,7 @@ def tracking(summary, output):
     handles, labels = axes[0].get_legend_handles_labels()
     figure.legend(handles, labels, loc="upper center", bbox_to_anchor=(.5, 1.04),
                   ncol=2, frameon=False)
-    _save(figure, output / "experiment_02_paper_tracking.png")
+    _save(figure, output / "experiment-02-paper-tracking.png")
 
 
 def main():

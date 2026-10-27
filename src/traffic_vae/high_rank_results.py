@@ -82,7 +82,7 @@ def export(source, output):
     a = old[old.gamma == 0].set_index(['seed', 'method'])[metric_columns].sort_index()
     b = new[new.gamma == 0].set_index(['seed', 'method'])[metric_columns].sort_index()
     np.testing.assert_allclose(a.to_numpy(), b.to_numpy(), rtol=1e-12, atol=1e-12)
-    previous_export = Path('output/experiment_03/results.json')
+    previous_export = Path('output/experiment-03/results.json')
     original_sources_unchanged = None
     if previous_export.exists():
         previous = json.loads(previous_export.read_text())
@@ -175,7 +175,7 @@ def draw(frame, ranks, output):
                 for seed, marker in MARKERS.items()]
     figure.legend(handles=handles, loc='lower center', ncol=4, frameon=False, fontsize=8)
     figure.tight_layout(rect=(0, .09, 1, 1))
-    figure.savefig(output / 'method_comparison.png', bbox_inches='tight')
+    figure.savefig(output / 'method-comparison.png', bbox_inches='tight')
     plt.close(figure)
     figure, axis = plt.subplots(figsize=(6.7, 3.6))
     rank_frame = pd.DataFrame(ranks)
@@ -191,14 +191,14 @@ def draw(frame, ranks, output):
     axis.grid(alpha=.2)
     axis.legend(fontsize=8, frameon=False, loc='lower right')
     figure.tight_layout()
-    figure.savefig(output / 'normal_geometry.png', bbox_inches='tight')
+    figure.savefig(output / 'normal-geometry.png', bbox_inches='tight')
     plt.close(figure)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', default='runs/high_rank_sensitivity')
-    parser.add_argument('--output', default='output/high_rank_sensitivity')
+    parser.add_argument('--output', default='output/high-rank-sensitivity')
     args = parser.parse_args()
     export(args.source, args.output)
 

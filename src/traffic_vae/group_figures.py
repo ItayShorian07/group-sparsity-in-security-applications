@@ -73,7 +73,7 @@ def export(source, online_source=None):
     secondary_summary = secondary.groupby(['scenario', 'gamma', 'method'])[
         ['f1', 'precision', 'recall', 'false_positive_rate']].agg(['mean', 'std'])
     secondary_summary.columns = ['_'.join(column) for column in secondary_summary.columns]
-    directory = Path('output/experiment_03')
+    directory = Path('output/experiment-03')
     directory.mkdir(parents=True, exist_ok=True)
     quality = []
     for path in sorted((source / 'synthetic').glob('seed_*/gamma_*/*/solver.json')):
@@ -134,7 +134,7 @@ def export(source, online_source=None):
     fig.legend(handles=seed_handles, loc='lower center', ncol=4, frameon=False, fontsize=8)
     fig.tight_layout(rect=(0, .11, 1, 1))
     for suffix in ('png', 'pdf'):
-        fig.savefig(figures / f'experiment_03_real_comparison.{suffix}', bbox_inches='tight')
+        fig.savefig(figures / f'experiment-03-real-comparison.{suffix}', bbox_inches='tight')
     plt.close(fig)
 
     scenarios = [('paper_independent', 'Original independent attacks'),
@@ -169,9 +169,9 @@ def export(source, online_source=None):
     fig.legend(handles=handles, loc='lower center', ncol=len(handles), frameon=False, fontsize=8)
     fig.tight_layout(rect=(0, .07, 1, 1))
     for suffix in ('png', 'pdf'):
-        fig.savefig(figures / f'experiment_03_synthetic_comparison.{suffix}', bbox_inches='tight')
+        fig.savefig(figures / f'experiment-03-synthetic-comparison.{suffix}', bbox_inches='tight')
     plt.close(fig)
-    print('Exported output/experiment_03/results.json and two Experiment-3 figures.')
+    print('Exported output/experiment-03/results.json and two Experiment-3 figures.')
 
 
 def main():

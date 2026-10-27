@@ -95,7 +95,7 @@ def run_tracking(tracking):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', type=Path, default=Path('experiment_02_tracking.json'))
+    parser.add_argument('--config', type=Path, default=Path('experiment-02-tracking.json'))
     parser.add_argument('--validate-only', action='store_true')
     args = parser.parse_args()
     try:

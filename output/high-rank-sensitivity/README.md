@@ -85,11 +85,11 @@ metric or generator result.
 
 - [Complete results and provenance](results.json): all seeds, settings, primary
   and secondary metrics, paired differences, source hashes, and solver audits.
-- [Method comparison](method_comparison.png): AP, calibrated flow F1, and group
+- [Method comparison](method-comparison.png): AP, calibrated flow F1, and group
   F1 across all five gamma values and three attack scenarios; means +/- 1 SD.
-- [Normal-signal geometry](normal_geometry.png): effective linear ranks and
+- [Normal-signal geometry](normal-geometry.png): effective linear ranks and
   the fixed rank budgets of the two OnlineDA controls.
-- [Protocol and reproduction commands](../../HIGH_RANK_SENSITIVITY.md).
+- [Protocol and reproduction commands](../../HIGH-RANK-SENSITIVITY.md).
 
 Raw arrays and the 15 newly trained model checkpoints remain local under
 `runs/high_rank_sensitivity/`. They do not overwrite the original runs.

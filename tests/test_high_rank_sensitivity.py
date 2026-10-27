@@ -13,8 +13,8 @@ from traffic_vae.paper_synthetic import generate
 class HighRankSensitivityTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.settings = json.loads(Path('high_rank_sensitivity.json').read_text())
-        config = load_config('experiment_02.json')
+        cls.settings = json.loads(Path('high-rank-sensitivity.json').read_text())
+        config = load_config('experiment-02.json')
         config.update(train_size=4000, validation_size=30, calibration_size=30, test_size=200)
         cls.original = generate(config, 17)
 

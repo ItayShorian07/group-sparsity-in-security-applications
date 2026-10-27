@@ -166,7 +166,7 @@ def run(config: dict) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=Path("experiment_01.json"))
+    parser.add_argument("--config", type=Path, default=Path("experiment-01.json"))
     args = parser.parse_args()
     try:
         run(load_config(args.config))

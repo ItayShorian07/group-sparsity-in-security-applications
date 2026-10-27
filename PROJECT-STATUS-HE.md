@@ -125,18 +125,18 @@ AP של 0.9998 ושגיאת שחזור 0.1894. היתרון של Group הוא ב
 
 ## קבצים מרכזיים
 
-- `EXPERIMENT_02.md` — פרוטוקול מלא, סטיות מהמאמר ותוצאות.
-- `EXPERIMENT_03.md`, `experiment_03.json` — פרוטוקול והגדרות ההשוואה הקבוצתית.
-- `output/experiment_03/results.json` — תוצאות מלאות לכל seed וביקורת נומרית.
+- `EXPERIMENT-02.md` — פרוטוקול מלא, סטיות מהמאמר ותוצאות.
+- `EXPERIMENT-03.md`, `experiment-03.json` — פרוטוקול והגדרות ההשוואה הקבוצתית.
+- `output/experiment-03/results.json` — תוצאות מלאות לכל seed וביקורת נומרית.
 - `runs/experiment_03_full/` — מערכים, ציונים ולוגים של הניסוי השלישי.
 - `runs/experiment_03_onlineda/` — הרצות האלגוריתם מהמאמר בניסוי 3 ובדיקות שחזור.
 - `src/traffic_vae/experiment_03_online.py` — הרחבת ההשוואה בלי לשנות ריצות קודמות.
-- `experiment_02.json` — הסריקה הראשית.
-- `experiment_02_tracking.json` — ארבעת תרחישי Figure 4.
+- `experiment-02.json` — הסריקה הראשית.
+- `experiment-02-tracking.json` — ארבעת תרחישי Figure 4.
 - `runs/experiment_02_paper/` — תוצאות הסריקה הראשית.
 - `runs/experiment_02_tracking/` — תוצאות תרחישי tracking.
-- `output/pdf/group_sparsity_project_report.pdf` — דוח הפרויקט המעודכן עם הטבלאות והגרפים.
-- `group_sparsity_project_report.tex` — מקור ה-LaTeX של דוח הפרויקט.
+- `output/pdf/group sparsity project report.pdf` — דוח הפרויקט המעודכן עם הטבלאות והגרפים.
+- `group sparsity project report.tex` — מקור ה-LaTeX של דוח הפרויקט.
 
 ## בדיקת רגישות נפרדת: דאטה לא-לינארי מדרגה לינארית גבוהה
 
@@ -154,5 +154,5 @@ OnlineDA גבוהים משל שני מפענחי ה-VAE. בקצה הלא-לינ�
 כל החריגים מדווחים, בלי לבחור רק מדד או תרחיש שתומך בהשערה.
 
 22 בדיקות יחידה עברו. הנתונים, התוצאות, הקוד וה-PDF של הניסויים המקוריים
-לא הוחלפו. פרוטוקול: `HIGH_RANK_SENSITIVITY.md`; תוצאות וגרפים נפרדים:
-`output/high_rank_sensitivity/`; ריצות ומודלים: `runs/high_rank_sensitivity/`.
+לא הוחלפו. פרוטוקול: `HIGH-RANK-SENSITIVITY.md`; תוצאות וגרפים נפרדים:
+`output/high-rank-sensitivity/`; ריצות ומודלים: `runs/high_rank_sensitivity/`.

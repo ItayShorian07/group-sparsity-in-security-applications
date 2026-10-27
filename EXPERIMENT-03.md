@@ -10,7 +10,7 @@ or present score denoising as physical attack-amplitude recovery.
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python -m traffic_vae.experiment_03 --config experiment_03.json
+.venv/bin/python -m traffic_vae.experiment_03 --config experiment-03.json
 .venv/bin/python -m traffic_vae.experiment_03_online --source runs/experiment_03_full --output runs/experiment_03_onlineda
 .venv/bin/python -m traffic_vae.group_figures --online-source runs/experiment_03_onlineda
 ```
@@ -21,7 +21,7 @@ for the OnlineDA extension, supply the corresponding `--source` and a new `--out
 Source data, checkpoints,
 and splits must already exist from Experiments 1 and 2. Raw data and arrays
 remain local under `runs/`; portable per-seed results, audits, and provenance
-are exported to `output/experiment_03/results.json`.
+are exported to `output/experiment-03/results.json`.
 
 The preliminary endpoint-only run is retained under `runs/experiment_03`.
 The final run under `runs/experiment_03_full` covers every original gamma:

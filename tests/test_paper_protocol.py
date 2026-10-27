@@ -18,7 +18,7 @@ class PaperProtocolTests(unittest.TestCase):
         self.assertTrue((network['adjacency'] == network['adjacency'].T).all())
 
     def test_gamma_zero_is_the_paper_linear_endpoint(self):
-        config = load_config('experiment_02.json')
+        config = load_config('experiment-02.json')
         config.update(train_size=30, validation_size=20, calibration_size=20,
                       test_size=200, attack_probability=.02)
         base = generate(config, 42)
@@ -31,7 +31,7 @@ class PaperProtocolTests(unittest.TestCase):
         )
 
     def test_routing_alpha_and_observation_probability_follow_paper_notation(self):
-        config = load_config('experiment_02.json')
+        config = load_config('experiment-02.json')
         config.update(train_size=100, validation_size=50, calibration_size=50,
                       test_size=300, attack_probability=.02,
                       routing_alpha=.1, observation_probability=.8)
@@ -68,7 +68,7 @@ class PaperProtocolTests(unittest.TestCase):
         np.testing.assert_allclose(tracker.basis[0], first_link_before)
 
     def test_tracking_scenarios_use_the_paper_alpha_values(self):
-        tracking = load_tracking_config('experiment_02_tracking.json')
+        tracking = load_tracking_config('experiment-02-tracking.json')
         self.assertEqual({item['routing_alpha'] for item in tracking['scenarios']}, {.01, .1})
         self.assertEqual({item['observation_probability'] for item in tracking['scenarios']}, {.8, 1})
         self.assertEqual(tracking['gammas'], [0])

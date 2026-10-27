@@ -2,7 +2,7 @@
 
 The real-data arm is identity-design score denoising, not routed OD recovery.
 The synthetic arm freezes the saved Experiment-2 VAEs and changes only decoding.
-All settings are declared in experiment_03.json before looking at test metrics.
+All settings are declared in experiment-03.json before looking at test metrics.
 """
 import argparse
 import json
@@ -341,7 +341,7 @@ def run(config_path, arms):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', default='experiment_03.json')
+    parser.add_argument('--config', default='experiment-03.json')
     parser.add_argument('--arms', nargs='+', choices=['real', 'synthetic'], default=['real', 'synthetic'])
     args = parser.parse_args()
     run(args.config, args.arms)

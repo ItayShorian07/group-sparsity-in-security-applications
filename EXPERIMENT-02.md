@@ -16,14 +16,14 @@ it does not recreate the authors' exact random realization or reported numbers.
 Validate configuration without generating data or training:
 
 ```bash
-.venv/bin/python -m traffic_vae.experiment_02 --config experiment_02.json --validate-only
+.venv/bin/python -m traffic_vae.experiment_02 --config experiment-02.json --validate-only
 ```
 
 Run all gamma values in the background from the repository root:
 
 ```bash
 mkdir -p runs
-nohup .venv/bin/python -m traffic_vae.experiment_02 --config experiment_02.json \
+nohup .venv/bin/python -m traffic_vae.experiment_02 --config experiment-02.json \
   > runs/experiment_02_paper.console.log 2>&1 < /dev/null &
 ```
 
@@ -37,7 +37,7 @@ Existing output directories are refused. To run only the linear control in a new
 directory:
 
 ```bash
-.venv/bin/python -m traffic_vae.experiment_02 --config experiment_02.json \
+.venv/bin/python -m traffic_vae.experiment_02 --config experiment-02.json \
   --gammas 0 --output-dir runs/experiment_02_paper_linear
 ```
 
@@ -216,14 +216,14 @@ reported aggregate metrics, and both result directories are retained for audit.
 
 ## Paper-style tracking stress tests
 
-`experiment_02_tracking.json` follows the four parameter combinations reported
+`experiment-02-tracking.json` follows the four parameter combinations reported
 around Figure 4 of the paper at the linear endpoint: routing-change probabilities
 `alpha` in `{0.01, 0.1}`, observation probabilities `pi` in `{0.8, 1}`, noise
 standard deviations in `{0.01, 1e-5}`, forgetting factor `beta=0.9`, and a
 1000-sample test stream. Run it with:
 
 ```bash
-.venv/bin/python -m traffic_vae.paper_tracking --config experiment_02_tracking.json
+.venv/bin/python -m traffic_vae.paper_tracking --config experiment-02-tracking.json
 ```
 
 This remains a matched VAE-versus-OnlineDA adaptation rather than an exact
@@ -281,5 +281,5 @@ The four tracking scenarios write the same per-scenario artifacts plus combined
 `runs/experiment_02_tracking/`.
 
 The original 50-channel experiment remains available as
-`experiment_02_legacy.json` and writes to `runs/experiment_02_legacy/`. Results
+`experiment-02-legacy.json` and writes to `runs/experiment_02_legacy/`. Results
 previously saved under `runs/experiment_02/` are unchanged.

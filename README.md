@@ -3,35 +3,45 @@
 Project report and implementation for the study of VAE-based anomaly detection
 and ordinary versus group-sparse attack localization.
 
-- [Project report (PDF)](output/pdf/group_sparsity_project_report.pdf)
-- [Report source (LaTeX)](group_sparsity_project_report.tex)
-- [Experiment 2 protocol](EXPERIMENT_02.md)
-- [Experiment 3 protocol and results](EXPERIMENT_03.md)
+- [Project report (PDF)](output/pdf/group%20sparsity%20project%20report.pdf)
+- [Report source (LaTeX)](group%20sparsity%20project%20report.tex)
+- [Experiment 2 protocol](EXPERIMENT-02.md)
+- [Experiment 3 protocol and results](EXPERIMENT-03.md)
 
 To rebuild the report with a LaTeX installation, run from the repository root:
 
 ```bash
-latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=output/pdf group_sparsity_project_report.tex
+latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=output/pdf "group sparsity project report.tex"
 ```
 
 The report contains the literature review and the three main experiments.
 The exploratory high-rank sensitivity results remain separate and are not
 included in the report.
 
+## File naming
+
+Human-facing documents, configurations, figures, and published result directories
+use spaces or hyphens instead of underscores. Python package/module identifiers,
+test-discovery names, JSON/CSV/NPZ fields, original dataset filenames, and archived
+run artifacts retain their existing names for import, loader, and provenance
+compatibility. In particular, `runs/` is an immutable record of completed runs;
+the portable exports under `output/` use the new directory names without changing
+their metrics or historical source-path records.
+
 ## Experiment 01: normal-only VAE for CIC-IDS2017
 
-Experiment 1 establishes the plain VAE baseline for network-flow anomaly detection. Each row is one observed flow and each retained column is a numeric traffic statistic. This baseline uses real, unchanged flow measurements without a sparse optimization stage. The separate [third experiment](EXPERIMENT_03.md) now compares ordinary and group-sparse decoding on recorded and synthetic data.
+Experiment 1 establishes the plain VAE baseline for network-flow anomaly detection. Each row is one observed flow and each retained column is a numeric traffic statistic. This baseline uses real, unchanged flow measurements without a sparse optimization stage. The separate [third experiment](EXPERIMENT-03.md) now compares ordinary and group-sparse decoding on recorded and synthetic data.
 
 ## Current project layout
 
 ```text
 .
-├── experiment_01.json       # Experiment settings and data paths
+├── experiment-01.json       # Experiment settings and data paths
 ├── README.md
 ├── pyproject.toml           # Package definition and dependencies
 ├── requirements-lock.txt    # Verified dependency versions
-├── group_sparsity_project_report.tex  # Project report source
-├── output/pdf/group_sparsity_project_report.pdf  # Compiled project report
+├── group sparsity project report.tex  # Project report source
+├── output/pdf/group sparsity project report.pdf  # Compiled project report
 ├── data/
 │   └── TrafficLabelling/    # Eight extracted CIC-IDS2017 CSV files
 ├── src/
@@ -61,7 +71,7 @@ on the [official CIC-IDS2017 page](https://www.unb.ca/cic/datasets/ids-2017.html
 From the repository root, run:
 
 ```bash
-.venv/bin/traffic-vae --config experiment_01.json
+.venv/bin/traffic-vae --config experiment-01.json
 ```
 
 The environment is already installed. There is no need to recreate it or reinstall
@@ -95,7 +105,7 @@ python3 -m venv .venv
 ```
 
 Place the extracted CSV files under `data/TrafficLabelling/`, or edit their paths in
-`experiment_01.json`. `requirements-lock.txt` records the dependency versions verified
+`experiment-01.json`. `requirements-lock.txt` records the dependency versions verified
 in the local Python 3.11/macOS ARM environment. To recreate those versions, install
 it with `.venv/bin/python -m pip install -r requirements-lock.txt` before installing
 this package. Other platforms may require compatible dependency versions.
@@ -156,7 +166,7 @@ Dataset citation: I. Sharafaldin, A. H. Lashkari, and A. A. Ghorbani, “Toward 
 
 ## Experiment 02: paper-model synthetic data
 
-The independent [second experiment](EXPERIMENT_02.md) uses the 15-node,
+The independent [second experiment](EXPERIMENT-02.md) uses the 15-node,
 52-directed-link, 210-OD-flow synthetic model described in Section VI-A of
 *Dynamic Anomalography* at gamma=0. Our nonlinear extension supplies the higher
 gamma values. Following the paper, alpha is reserved for routing-change probability.
@@ -172,22 +182,22 @@ not provide the exact sampled graph, matrices, arrays, or random seed. No datase
 download is required. Results are written to `runs/experiment_02_paper/`.
 
 ```bash
-.venv/bin/python -m traffic_vae.experiment_02 --config experiment_02.json
+.venv/bin/python -m traffic_vae.experiment_02 --config experiment-02.json
 ```
 
 The routing-change, missing-link, and noise scenarios reported around Figure 4
 are configured separately:
 
 ```bash
-.venv/bin/python -m traffic_vae.paper_tracking --config experiment_02_tracking.json
+.venv/bin/python -m traffic_vae.paper_tracking --config experiment-02-tracking.json
 ```
 
-See `EXPERIMENT_02.md` for the protocol, configuration, comparison limits, and outputs.
-The previous 50-channel generator remains available in `experiment_02_legacy.json`.
+See `EXPERIMENT-02.md` for the protocol, configuration, comparison limits, and outputs.
+The previous 50-channel generator remains available in `experiment-02-legacy.json`.
 
 ## Experiment 03: ordinary versus grouped sparse decoding
 
-The [third experiment](EXPERIMENT_03.md) reuses the frozen VAE models and exact
+The [third experiment](EXPERIMENT-03.md) reuses the frozen VAE models and exact
 data from both earlier experiments. On CICIDS2017, destination/time groups are
 used for identity-design anomaly-score denoising; no routing matrix is invented
 for these flow CSVs. On the synthetic network, destination groups are used in
@@ -198,13 +208,13 @@ OnlineDA is a third synthetic baseline, with unchanged Experiment-2 parameters
 and an independent copy of its normal-trained state for each test stream.
 
 ```bash
-.venv/bin/python -m traffic_vae.experiment_03 --config experiment_03.json
+.venv/bin/python -m traffic_vae.experiment_03 --config experiment-03.json
 .venv/bin/python -m traffic_vae.experiment_03_online
 .venv/bin/python -m traffic_vae.group_figures --online-source runs/experiment_03_onlineda
 ```
 
 Raw runs remain local under `runs/experiment_03_full/`. The portable
-`output/experiment_03/results.json` retains all seed-level results and audits.
+`output/experiment-03/results.json` retains all seed-level results and audits.
 The additional OnlineDA arrays, replay checks, and diagnostics remain under
 `runs/experiment_03_onlineda/`; the original VAE results are not overwritten.
 The project report includes the primary results, two new figures, numerical checks,
@@ -212,14 +222,14 @@ and the limitations of the real-data and synthetic arms.
 
 ## Exploratory high-rank nonlinear sensitivity
 
-The separate [high-rank sensitivity protocol](HIGH_RANK_SENSITIVITY.md) tests a
+The separate [high-rank sensitivity protocol](HIGH-RANK-SENSITIVITY.md) tests a
 two-latent-dimensional, 16-feature Fourier manifold with a broad linear spectrum.
 It retrains the synthetic VAEs and repeats routed Lasso / Group-Lasso / OnlineDA
 comparisons, with a fixed OnlineDA rank-16 capacity control. This is an artificial
 stress test, not a replacement selected for favorable VAE test performance.
 The original experiments, main figures, and project-report results are preserved.
 Completed outcomes, both favorable and unfavorable operating points, and
-separate figures are in the [result summary](output/high_rank_sensitivity/README.md).
+separate figures are in the [result summary](output/high-rank-sensitivity/README.md).
 
 ```bash
 .venv/bin/python -m traffic_vae.high_rank_sensitivity

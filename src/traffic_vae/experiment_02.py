@@ -324,7 +324,7 @@ def run(config: dict) -> Path:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', type=Path, default=Path('experiment_02.json'))
+    parser.add_argument('--config', type=Path, default=Path('experiment-02.json'))
     parser.add_argument('--output-dir', type=Path,
                         help='Use a new output directory; existing directories are refused.')
     parser.add_argument('--alphas', type=float, nargs='+',

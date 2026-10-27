@@ -4,7 +4,7 @@
 
 Can a two-latent-dimensional nonlinear normal-traffic generator with a broad
 linear spectrum change the comparison between VAE sparse decoding and OnlineDA?
-The generator and settings in `high_rank_sensitivity.json` are fixed before
+The generator and settings in `high-rank-sensitivity.json` are fixed before
 evaluating its new test metrics. This is an exploratory stress test prompted by
 the earlier results, not an independently preregistered confirmatory experiment.
 No generator search or selection for favorable VAE test scores is performed.
@@ -100,7 +100,7 @@ is unchanged; they are not silently relabeled as high-rank nonlinear tests.
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python -m traffic_vae.high_rank_sensitivity --config high_rank_sensitivity.json
+.venv/bin/python -m traffic_vae.high_rank_sensitivity --config high-rank-sensitivity.json
 .venv/bin/python -m traffic_vae.high_rank_results
 ```
 
@@ -111,8 +111,8 @@ rows remain under `runs/high_rank_sensitivity/`. There is no test-set early
 stopping or test-label tuning.
 The second command exports every completed comparison, the unchanged original
 linear-control regression check, paired seed differences, solver diagnostics,
-and two scientific figures under `output/high_rank_sensitivity/`. It does not
-replace `output/experiment_03/results.json`, the main figures, or the project report.
+and two scientific figures under `output/high-rank-sensitivity/`. It does not
+replace `output/experiment-03/results.json`, the main figures, or the project report.
 
 ## Completed outcome
 
@@ -124,5 +124,5 @@ the VAEs beat rank-5 OnlineDA in some settings, including all three scenarios
 at gamma=1. That advantage is absent against rank 16 and does not imply a
 better AP or calibrated F1. The full positive and negative outcomes, including
 numerical exceptions and limitations, are in the
-[result summary](output/high_rank_sensitivity/README.md). Original results and
+[result summary](output/high-rank-sensitivity/README.md). Original results and
 the main project-report results have not been replaced.
